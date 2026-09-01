@@ -2,7 +2,6 @@
 
 import { useEffect, type ReactNode } from "react";
 import { XIcon } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function AppModal({
@@ -36,7 +35,7 @@ export function AppModal({
       <button
         type="button"
         aria-label="Close dialog"
-        className="absolute inset-0 bg-black/25"
+        className="absolute inset-0 bg-[#004b49]/55"
         onClick={onClose}
       />
       <div
@@ -44,27 +43,31 @@ export function AppModal({
         aria-modal="true"
         aria-labelledby="app-modal-title"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/10",
+          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-[#c5a44e] bg-[#fffcf7] p-6 text-sm text-[#1c1914] shadow-2xl",
           className,
         )}
       >
         <div className="flex flex-col gap-1 pr-8">
-          <h2 id="app-modal-title" className="text-base font-medium">
+          <p className="text-[10px] tracking-[0.32em] text-[#c5a44e] uppercase">
+            Reserve
+          </p>
+          <h2
+            id="app-modal-title"
+            className="text-3xl font-medium italic"
+            style={{ fontFamily: "var(--font-cormorant), serif" }}
+          >
             {title}
           </h2>
           {description ? (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="mt-1 text-sm text-[#6b6458]">{description}</p>
           ) : null}
         </div>
         <button
           type="button"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "icon-sm" }),
-            "absolute top-2 right-2",
-          )}
+          className="absolute top-3 right-3 p-2 text-[#6b6458] hover:text-[#004b49]"
           onClick={onClose}
         >
-          <XIcon />
+          <XIcon className="size-4" />
           <span className="sr-only">Close</span>
         </button>
         {children}

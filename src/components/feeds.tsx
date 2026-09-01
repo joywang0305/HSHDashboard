@@ -7,7 +7,7 @@ export function HubFeed() {
   const { board, loading, error } = useBoard();
 
   if (loading && !board) {
-    return <div className="h-48 animate-pulse rounded-xl bg-stone-300/80" />;
+    return <div className="h-48 animate-pulse bg-[#efe8da]" />;
   }
   if (error && !board) {
     return (
@@ -19,27 +19,39 @@ export function HubFeed() {
   if (!board) return null;
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Stories from HSH Hub. On production this feed is the Hub API or a
-        SharePoint news web part, cached for every kiosk.
-      </p>
-      <ul className="grid gap-3">
-        {board.hub.map((story) => (
-          <li
-            key={story.id}
-            className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
-          >
-            <p className="text-xs font-medium tracking-wide text-teal-800 uppercase">
+    <ul className="grid gap-8">
+      {board.hub.map((story) => (
+        <li
+          key={story.id}
+          className="grid overflow-hidden border border-[#d9cdb8] bg-white md:grid-cols-[18rem_1fr]"
+        >
+          <div className="relative min-h-48">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={story.image}
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col justify-center px-6 py-8 md:px-10">
+            <p className="text-[11px] tracking-[0.28em] text-[#c5a44e] uppercase">
               {story.author} · {formatShortDate(story.publishedAt)}{" "}
               {formatClock(story.publishedAt)}
             </p>
-            <h2 className="mt-1 text-lg font-semibold">{story.title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{story.summary}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <h2
+              className="mt-3 text-3xl font-medium italic leading-tight"
+              style={{ fontFamily: "var(--font-cormorant), serif" }}
+            >
+              {story.title}
+            </h2>
+            <span className="my-4 block h-px w-12 bg-[#c5a44e]" />
+            <p className="max-w-xl text-sm leading-relaxed text-[#6b6458]">
+              {story.summary}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -47,7 +59,7 @@ export function SharePointFeed() {
   const { board, loading, error } = useBoard();
 
   if (loading && !board) {
-    return <div className="h-48 animate-pulse rounded-xl bg-stone-300/80" />;
+    return <div className="h-48 animate-pulse bg-[#efe8da]" />;
   }
   if (error && !board) {
     return (
@@ -65,23 +77,26 @@ export function SharePointFeed() {
   } as const;
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Recent files and pages from the HSH SharePoint site, read through
-        Microsoft Graph. Every wall PC sees the same snapshot.
-      </p>
-      <ul className="divide-y overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
-        {board.sharepoint.map((item) => (
-          <li key={item.id} className="px-4 py-3">
-            <p className="font-medium">{item.name}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {kindLabel[item.kind]} · {item.library} · {item.modifiedBy} ·{" "}
-              {formatShortDate(item.modifiedAt)}
+    <ul className="divide-y divide-[#d9cdb8] border border-[#d9cdb8] bg-white">
+      {board.sharepoint.map((item) => (
+        <li key={item.id} className="flex items-start justify-between gap-4 px-5 py-5">
+          <div>
+            <p className="text-[10px] tracking-[0.24em] text-[#c5a44e] uppercase">
+              {kindLabel[item.kind]}
             </p>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <p
+              className="mt-1 text-xl"
+              style={{ fontFamily: "var(--font-cormorant), serif" }}
+            >
+              {item.name}
+            </p>
+            <p className="mt-1 text-xs tracking-[0.04em] text-[#6b6458]">
+              {item.library} · {item.modifiedBy} · {formatShortDate(item.modifiedAt)}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -89,16 +104,27 @@ export function StripNews() {
   const { board } = useBoard();
   if (!board) return null;
   return (
-    <div className="grid gap-3 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-3">
       {board.hub.slice(0, 3).map((story) => (
-        <div
-          key={story.id}
-          className="rounded-xl bg-card px-4 py-3 ring-1 ring-foreground/10"
-        >
-          <p className="text-[11px] font-medium tracking-wide text-teal-800 uppercase">
-            HSH Hub
-          </p>
-          <p className="mt-1 text-sm font-semibold leading-snug">{story.title}</p>
+        <div key={story.id} className="group relative min-h-44 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={story.image}
+            alt=""
+            className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#004b49] via-[#004b49]/40 to-transparent" />
+          <div className="relative z-10 flex h-full min-h-44 flex-col justify-end p-4 text-white">
+            <p className="text-[10px] tracking-[0.28em] text-[#c5a44e] uppercase">
+              HSH Hub
+            </p>
+            <p
+              className="mt-1 text-xl leading-snug italic"
+              style={{ fontFamily: "var(--font-cormorant), serif" }}
+            >
+              {story.title}
+            </p>
+          </div>
         </div>
       ))}
     </div>

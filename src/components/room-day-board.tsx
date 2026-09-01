@@ -70,8 +70,8 @@ export function RoomDayBoard() {
   if (loading && !board) {
     return (
       <div className="space-y-3" aria-busy="true">
-        <div className="h-24 animate-pulse rounded-xl bg-stone-300/80" />
-        <div className="h-80 animate-pulse rounded-xl bg-stone-300/80" />
+        <div className="h-24 animate-pulse bg-[#efe8da]" />
+        <div className="h-80 animate-pulse bg-[#efe8da]" />
       </div>
     );
   }
@@ -80,7 +80,7 @@ export function RoomDayBoard() {
     return (
       <p
         role="alert"
-        className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-800"
+        className="border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-800"
       >
         {error}
       </p>
@@ -106,15 +106,15 @@ export function RoomDayBoard() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
+    <div className="space-y-5">
+      <div className="overflow-x-auto border border-[#d9cdb8] bg-white">
         <div
           className="grid min-w-[720px]"
           style={{
-            gridTemplateColumns: `4.5rem repeat(${board.rooms.length}, minmax(9rem, 1fr))`,
+            gridTemplateColumns: `4.5rem repeat(${board.rooms.length}, minmax(10rem, 1fr))`,
           }}
         >
-          <div className="border-b border-border px-2 py-3 text-xs text-muted-foreground">
+          <div className="flex items-end border-b border-[#d9cdb8] px-2 py-3 text-[10px] tracking-[0.2em] text-[#6b6458] uppercase">
             Time
           </div>
           {board.rooms.map((room) => {
@@ -122,20 +122,34 @@ export function RoomDayBoard() {
             return (
               <div
                 key={room.id}
-                className="border-b border-l border-border px-3 py-3"
+                className="relative h-36 overflow-hidden border-b border-l border-[#d9cdb8]"
               >
-                <p className="font-semibold text-foreground">{room.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {room.capacity} seats · {room.floor}
-                </p>
-                <p
-                  className={cn(
-                    "mt-1 text-xs font-medium",
-                    status.busy ? "text-red-700" : "text-teal-800",
-                  )}
-                >
-                  {status.label}
-                </p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={room.image}
+                  alt=""
+                  className="absolute inset-0 size-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#004b49] via-[#004b49]/55 to-black/10" />
+                <div className="relative z-10 flex h-full flex-col justify-end p-3 text-white">
+                  <p
+                    className="text-lg leading-tight"
+                    style={{ fontFamily: "var(--font-cormorant), serif" }}
+                  >
+                    {room.name}
+                  </p>
+                  <p className="text-[10px] tracking-[0.12em] text-white/75 uppercase">
+                    {room.capacity} seats · {room.floor}
+                  </p>
+                  <p
+                    className={cn(
+                      "mt-1 text-[10px] font-medium tracking-[0.08em] uppercase",
+                      status.busy ? "text-[#e8c4c4]" : "text-[#c5a44e]",
+                    )}
+                  >
+                    {status.label}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -143,14 +157,14 @@ export function RoomDayBoard() {
         <div
           className="relative grid min-w-[720px]"
           style={{
-            gridTemplateColumns: `4.5rem repeat(${board.rooms.length}, minmax(9rem, 1fr))`,
+            gridTemplateColumns: `4.5rem repeat(${board.rooms.length}, minmax(10rem, 1fr))`,
           }}
         >
           <div>
             {hoursLabel.map((item) => (
               <div
                 key={item.hour}
-                className="border-b border-border px-2 text-[11px] text-muted-foreground"
+                className="border-b border-[#efe8da] px-2 text-[11px] tracking-[0.08em] text-[#6b6458]"
                 style={{ height: HOUR_PX }}
               >
                 {item.label}
@@ -165,7 +179,7 @@ export function RoomDayBoard() {
             return (
               <div
                 key={room.id}
-                className="relative cursor-pointer border-l border-border bg-[repeating-linear-gradient(to_bottom,transparent,transparent_63px,var(--border)_63px,var(--border)_64px)]"
+                className="relative cursor-pointer border-l border-[#efe8da] bg-[repeating-linear-gradient(to_bottom,transparent,transparent_63px,#efe8da_63px,#efe8da_64px)]"
                 style={{ height: HOURS.length * HOUR_PX }}
                 onClick={(event) =>
                   pickSlot(room, event.clientY, event.currentTarget)
@@ -185,16 +199,16 @@ export function RoomDayBoard() {
               style={{ top: nowTop }}
             >
               <div className="flex items-center">
-                <span className="rounded bg-red-500 px-1 text-[10px] font-medium text-white">
+                <span className="bg-[#c5a44e] px-1.5 py-0.5 text-[9px] font-medium tracking-[0.16em] text-[#004b49] uppercase">
                   Now
                 </span>
-                <div className="h-0.5 flex-1 bg-red-500" />
+                <div className="h-px flex-1 bg-[#c5a44e]" />
               </div>
             </div>
           ) : null}
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-center text-xs tracking-[0.04em] text-[#6b6458]">
         Tap a free slot to book on the spot. Outlook holds the room calendars;
         this board is the shared kiosk view.
       </p>
@@ -220,12 +234,12 @@ function BookingBlock({ booking }: { booking: Booking }) {
   return (
     <button
       type="button"
-      className="absolute right-1 left-1 z-20 overflow-hidden rounded-md bg-teal-800 px-2 py-1 text-left text-white shadow-sm"
+      className="absolute right-1 left-1 z-20 overflow-hidden border-l-2 border-[#c5a44e] bg-[#004b49] px-2 py-1 text-left text-white shadow-sm"
       style={{ top, height }}
       onClick={(event) => event.stopPropagation()}
     >
-      <p className="truncate text-xs font-semibold">{booking.title}</p>
-      <p className="truncate text-[10px] text-teal-100">
+      <p className="truncate text-xs font-medium">{booking.title}</p>
+      <p className="truncate text-[10px] text-[#c5a44e]">
         {formatClock(booking.start)}–{formatClock(booking.end)} ·{" "}
         {booking.organizer}
       </p>

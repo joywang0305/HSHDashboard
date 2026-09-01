@@ -1,19 +1,21 @@
 "use client";
 
 import { SharePointFeed } from "@/components/feeds";
+import { PageHero, SectionFrame } from "@/components/page-hero";
 
 export default function SharePointPage() {
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-xs font-medium tracking-[0.16em] text-teal-800 uppercase">
-          SharePoint
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Site files and pages
-        </h1>
-      </div>
-      <SharePointFeed />
+    <div>
+      <PageHero
+        image="/heritage/night.jpg"
+        eyebrow="SharePoint"
+        title="Site files and pages"
+        lede="Recent documents and pages from the HSH SharePoint site, read through Microsoft Graph."
+        compact
+      />
+      <SectionFrame>
+        <SharePointFeed />
+      </SectionFrame>
     </div>
   );
 }

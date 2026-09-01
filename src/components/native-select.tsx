@@ -9,7 +9,7 @@ export function NativeSelect({
   return (
     <select
       className={cn(
-        "h-8 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        "h-11 w-full border border-[#d9cdb8] bg-white px-3 text-sm tracking-normal text-[#1c1914] outline-none focus-visible:border-[#c5a44e] focus-visible:ring-1 focus-visible:ring-[#c5a44e]",
         className,
       )}
       {...props}
@@ -26,7 +26,7 @@ export function NativeInput({
   return (
     <input
       className={cn(
-        "h-8 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        "h-11 w-full border border-[#d9cdb8] bg-white px-3 text-sm font-normal tracking-normal text-[#1c1914] outline-none placeholder:text-[#6b6458] focus-visible:border-[#c5a44e] focus-visible:ring-1 focus-visible:ring-[#c5a44e]",
         className,
       )}
       {...props}

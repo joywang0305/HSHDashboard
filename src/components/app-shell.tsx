@@ -3,46 +3,69 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CalendarDays, Menu, Newspaper, PanelsTopLeft } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import { useBoard } from "@/components/board-provider";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/", label: "Rooms", icon: CalendarDays },
-  { href: "/hub", label: "HSH Hub", icon: Newspaper },
-  { href: "/sharepoint", label: "SharePoint", icon: PanelsTopLeft },
+  { href: "/", label: "Rooms" },
+  { href: "/hub", label: "HSH Hub" },
+  { href: "/sharepoint", label: "SharePoint" },
 ];
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({
+  onNavigate,
+  className,
+}: {
+  onNavigate?: () => void;
+  className?: string;
+}) {
   const pathname = usePathname();
   return (
-    <nav className="flex flex-col gap-1">
+    <nav className={cn("flex items-center gap-8", className)}>
       {nav.map((item) => {
         const active =
           item.href === "/"
             ? pathname === "/"
             : pathname.startsWith(item.href);
-        const Icon = item.icon;
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "relative py-1 text-[11px] font-medium tracking-[0.28em] uppercase transition-colors",
               active
-                ? "bg-white/12 text-white"
-                : "text-teal-100/80 hover:bg-white/10 hover:text-white",
+                ? "text-[#c5a44e]"
+                : "text-white/75 hover:text-white",
             )}
           >
-            <Icon className="size-4" />
             {item.label}
+            {active ? (
+              <span className="absolute inset-x-0 -bottom-2 h-px bg-[#c5a44e]" />
+            ) : null}
           </Link>
         );
       })}
     </nav>
+  );
+}
+
+function Wordmark() {
+  return (
+    <Link href="/" className="group flex flex-col items-center text-center">
+      <span className="text-[9px] tracking-[0.55em] text-[#c5a44e]">THE</span>
+      <span
+        className="mt-0.5 text-[22px] leading-none tracking-[0.42em] text-white"
+        style={{ fontFamily: "var(--font-cinzel), serif" }}
+      >
+        HSH
+      </span>
+      <span className="mt-1 text-[8px] tracking-[0.48em] text-white/70">
+        DASHBOARD
+      </span>
+    </Link>
   );
 }
 
@@ -67,73 +90,77 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-full bg-[#f4f1ea]">
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-teal-950/40 bg-[#12352f] p-4 md:flex">
-        <Link href="/" className="mb-6 flex items-center gap-3 px-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-teal-400 text-sm font-bold text-teal-950">
-            HSH
-          </span>
-          <span>
-            <span className="block text-sm font-semibold text-white">
-              HSH Dashboard
-            </span>
-            <span className="block text-xs text-teal-200/80">Kiosk board</span>
-          </span>
-        </Link>
-        <NavLinks />
-        <p className="mt-auto px-2 text-xs text-teal-100/70">
-          One URL for every wall PC. Outlook is the booking source of truth.
-        </p>
-      </aside>
-      <div className="md:pl-60">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-stone-200/80 bg-[#f4f1ea]/90 px-4 py-3 backdrop-blur md:px-8">
+    <div className="min-h-full bg-[#f7f3eb]">
+      <header className="sticky top-0 z-40 border-b border-[#c5a44e] bg-[#004b49] text-white">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-4 md:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="border border-[#c5a44e]/60 p-2 text-[#c5a44e] md:hidden"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className="size-4" />
+              <span className="sr-only">Open menu</span>
+            </button>
+            <div className="hidden min-w-0 md:block">
+              <p className="text-[11px] tracking-[0.22em] text-[#c5a44e] uppercase">
+                {clock}
+              </p>
+              <p className="mt-0.5 text-[10px] tracking-[0.16em] text-white/55 uppercase">
+                {board
+                  ? board.source === "graph"
+                    ? "Outlook live"
+                    : "Outlook mock"
+                  : "Board"}
+              </p>
+            </div>
+          </div>
+          <Wordmark />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="border border-[#c5a44e] px-3 py-2 text-[10px] font-medium tracking-[0.22em] text-[#c5a44e] uppercase transition-colors hover:bg-[#c5a44e] hover:text-[#004b49]"
+              onClick={() => {
+                void resetDemo().then(() =>
+                  toast.success("Demo board restored"),
+                );
+              }}
+            >
+              Restore demo
+            </button>
+          </div>
+        </div>
+        <div className="hidden justify-center border-t border-[#c5a44e]/30 py-3 md:flex">
+          <NavLinks />
+        </div>
+      </header>
+      {mobileOpen ? (
+        <div className="fixed inset-0 z-50 md:hidden">
           <button
             type="button"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "icon" }),
-              "md:hidden",
-            )}
-            onClick={() => setMobileOpen(true)}
-          >
-            <Menu />
-            <span className="sr-only">Open menu</span>
-          </button>
-          {mobileOpen ? (
-            <div className="fixed inset-0 z-50 md:hidden">
+            aria-label="Close menu"
+            className="absolute inset-0 bg-black/45"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-[#004b49] p-6">
+            <div className="mb-8 flex items-center justify-between">
+              <Wordmark />
               <button
                 type="button"
-                aria-label="Close menu"
-                className="absolute inset-0 bg-black/30"
+                className="p-2 text-[#c5a44e]"
                 onClick={() => setMobileOpen(false)}
-              />
-              <div className="absolute inset-y-0 left-0 w-72 bg-[#12352f] p-4">
-                <NavLinks onNavigate={() => setMobileOpen(false)} />
-              </div>
+              >
+                <X className="size-4" />
+              </button>
             </div>
-          ) : null}
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">
-              {clock}
-              {board ? ` · ${board.source === "graph" ? "Outlook" : "Outlook mock"}` : ""}
-            </p>
-            <p className="hidden text-xs text-muted-foreground sm:block">
-              All kiosks poll the same board feed.
-            </p>
+            <NavLinks
+              onNavigate={() => setMobileOpen(false)}
+              className="flex-col items-start gap-6"
+            />
           </div>
-          <button
-            type="button"
-            className={cn(buttonVariants({ variant: "outline" }), "ml-auto")}
-            onClick={() => {
-              void resetDemo().then(() =>
-                toast.success("Demo board restored"),
-              );
-            }}
-          >
-            Restore demo
-          </button>
-        </header>
-        <main className="px-4 py-6 md:px-8 md:py-8">{children}</main>
-      </div>
+        </div>
+      ) : null}
+      <main>{children}</main>
     </div>
   );
 }

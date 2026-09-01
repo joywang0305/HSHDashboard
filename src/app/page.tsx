@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHero, SectionFrame } from "@/components/page-hero";
 import { RoomDayBoard } from "@/components/room-day-board";
 import { StripNews } from "@/components/feeds";
 import { useBoard } from "@/components/board-provider";
@@ -9,21 +10,31 @@ export default function RoomsPage() {
   const { board } = useBoard();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-xs font-medium tracking-[0.16em] text-teal-800 uppercase">
-          Meeting rooms
+    <div>
+      <PageHero
+        image="/heritage/entrance.jpg"
+        eyebrow="Meeting rooms"
+        title={board ? formatDayLabel(board.date) : "Today’s rooms"}
+        lede="Live Outlook calendars for every HSH room, on every wall PC. Tap a free slot to book without opening a laptop."
+      />
+      <SectionFrame>
+        <StripNews />
+        <div className="mt-10">
+          <RoomDayBoard />
+        </div>
+      </SectionFrame>
+      <section className="relative h-40 overflow-hidden md:h-56">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/heritage/pool.jpg"
+          alt=""
+          className="absolute inset-0 size-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#004b49]/45" />
+        <p className="relative z-10 flex h-full items-center justify-center px-6 text-center text-[11px] tracking-[0.35em] text-[#c5a44e] uppercase">
+          One URL for every kiosk · Outlook remains the source of truth
         </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
-          {board ? formatDayLabel(board.date) : "Today’s rooms"}
-        </h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Live Outlook calendars for every HSH room, on every wall PC. Tap a
-          free slot to book without opening a laptop.
-        </p>
-      </div>
-      <StripNews />
-      <RoomDayBoard />
+      </section>
     </div>
   );
 }

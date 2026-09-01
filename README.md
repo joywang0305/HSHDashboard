@@ -2,6 +2,8 @@
 
 Shared kiosk board for **HSH** workplaces. Every wall PC opens the same URL.
 
+The interface is styled after a heritage hotel lobby — Peninsula green, gold hairlines, serif headlines, and full-bleed photography — so a wall PC reads as a concierge board rather than a spreadsheet.
+
 1. **Rooms** — today’s Outlook meeting-room calendars, with on-the-spot booking
 2. **HSH Hub** — workplace notices
 3. **SharePoint** — recent site files and pages
@@ -45,3 +47,7 @@ Copy `.env.example` to `.env.local` and register an Entra ID app with applicatio
 - `Sites.Read.All` (SharePoint)
 
 Until those values exist, the board uses the mock Graph adapter (`source: mock` in the header).
+
+## Photography
+
+Room interiors and the Tokyo entrance / night façade are Peninsula Hotels marketing stills archived from [peninsula.com](https://www.peninsula.com). Hub photographs of The Peninsula Hong Kong lobby, arcade, and afternoon tea are from Wikimedia Commons.

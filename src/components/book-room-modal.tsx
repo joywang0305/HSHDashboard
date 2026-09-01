@@ -3,11 +3,9 @@
 import { useMemo, useState } from "react";
 import { AppModal } from "@/components/app-modal";
 import { NativeInput, NativeSelect } from "@/components/native-select";
-import { buttonVariants } from "@/components/ui/button";
 import { useBoard } from "@/components/board-provider";
 import { addMinutes, formatClock } from "@/lib/time";
 import type { Room } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 export type SlotDraft = {
   room: Room;
@@ -80,19 +78,19 @@ export function BookRoomModal({
       {error ? (
         <p
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+          className="border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
         >
           {error}
         </p>
       ) : null}
       <form
-        className="grid gap-3"
+        className="grid gap-4"
         onSubmit={(event) => {
           event.preventDefault();
           void submit();
         }}
       >
-        <label className="grid gap-1.5 text-sm font-medium">
+        <label className="grid gap-1.5 text-[11px] font-medium tracking-[0.18em] text-[#004b49] uppercase">
           Meeting title
           <NativeInput
             value={title}
@@ -101,7 +99,7 @@ export function BookRoomModal({
             autoFocus
           />
         </label>
-        <label className="grid gap-1.5 text-sm font-medium">
+        <label className="grid gap-1.5 text-[11px] font-medium tracking-[0.18em] text-[#004b49] uppercase">
           Booked by
           <NativeInput
             value={organizer}
@@ -109,7 +107,7 @@ export function BookRoomModal({
             placeholder="Name as it should appear on the board"
           />
         </label>
-        <label className="grid gap-1.5 text-sm font-medium">
+        <label className="grid gap-1.5 text-[11px] font-medium tracking-[0.18em] text-[#004b49] uppercase">
           Duration
           <NativeSelect
             value={String(minutes)}
@@ -122,11 +120,11 @@ export function BookRoomModal({
             ))}
           </NativeSelect>
         </label>
-        <div className="-mx-4 -mb-4 flex justify-end border-t bg-muted/50 p-4">
+        <div className="-mx-6 -mb-6 mt-2 flex justify-end border-t border-[#d9cdb8] bg-[#f7f3eb] p-4">
           <button
             type="submit"
             disabled={saving}
-            className={cn(buttonVariants(), "min-w-28")}
+            className="min-w-32 border border-[#004b49] bg-[#004b49] px-5 py-2.5 text-[11px] font-medium tracking-[0.22em] text-[#f7f3eb] uppercase transition-colors hover:bg-[#0a5a57] disabled:opacity-60"
           >
             {saving ? "Booking…" : "Book room"}
           </button>

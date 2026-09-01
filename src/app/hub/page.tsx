@@ -1,19 +1,21 @@
 "use client";
 
 import { HubFeed } from "@/components/feeds";
+import { PageHero, SectionFrame } from "@/components/page-hero";
 
 export default function HubPage() {
   return (
-    <div className="space-y-4">
-      <div>
-        <p className="text-xs font-medium tracking-[0.16em] text-teal-800 uppercase">
-          HSH Hub
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Workplace notices
-        </h1>
-      </div>
-      <HubFeed />
+    <div>
+      <PageHero
+        image="/heritage/tea.jpg"
+        eyebrow="HSH Hub"
+        title="Workplace notices"
+        lede="Stories from HSH Hub, shown the same way on every wall PC."
+        compact
+      />
+      <SectionFrame>
+        <HubFeed />
+      </SectionFrame>
     </div>
   );
 }
