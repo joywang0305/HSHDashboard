@@ -40,6 +40,50 @@ Use **<** and **>** beside the date to move one day at a time, or tap the date t
 
 Kiosk PCs: open that URL fullscreen (Chrome `--kiosk`). They do not need a Microsoft login.
 
+## Ubuntu wall PC (Chromium kiosk)
+
+`http://127.0.0.1:43127` is this app on **the same machine**. It is not a public address. If Chromium returns you to the terminal after a few seconds, either nothing is listening on 43127 on that PC, or snap Chromium crashed on the GPU.
+
+On the ThinkCentre, first run the board and confirm it answers:
+
+```bash
+git clone https://github.com/joywang0305/HSHDashboard.git
+cd HSHDashboard
+npm install
+npm run build
+npm start
+```
+
+In another terminal:
+
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:43127
+```
+
+You want `200`. Then open kiosk mode. On Haswell ThinkCentre PCs, disable GPU and use X11 so snap Chromium does not exit:
+
+```bash
+chromium --kiosk --noerrdialogs --disable-infobars \
+  --disable-session-crashed-bubble \
+  --password-store=basic \
+  --ozone-platform=x11 \
+  --disable-gpu \
+  --disable-software-rasterizer \
+  "http://127.0.0.1:43127"
+```
+
+These lines in the terminal are noise and can be ignored:
+
+- `Not loading module "atk-bridge"`
+- `Haswell Vulkan support is incomplete`
+- `iHD_drv_video.so init failed`
+- `IdleMonitor.AddIdleWatch` / AppArmor `AccessDenied`
+- `DEPRECATED_ENDPOINT`
+
+They come from snap Chromium and the old Intel GPU, not from this dashboard. The window should stay open until you leave kiosk (often Alt+F4).
+
+To start the board on boot, run `npm start` from a systemd user service (or a desktop autostart entry), then launch the Chromium command above from autostart as well. Every wall PC can instead open one hosted URL once you deploy; they do not each need Node if they share that URL.
+
 ## Connect Outlook later
 
 Copy `.env.example` to `.env.local` and register an Entra ID app with application permissions:
