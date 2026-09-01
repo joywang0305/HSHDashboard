@@ -5,7 +5,6 @@ export type Room = {
   capacity: number;
   floor: string;
   equipment: string[];
-  image: string;
 };
 
 export type Booking = {
@@ -25,7 +24,6 @@ export type HubStory = {
   publishedAt: string;
   author: string;
   href: string;
-  image: string;
 };
 
 export type SharePointItem = {

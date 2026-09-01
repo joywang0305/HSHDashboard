@@ -14,7 +14,6 @@ export function seedRooms(): Room[] {
       capacity: 12,
       floor: "Level 3",
       equipment: ["Teams Room", "Whiteboard"],
-      image: "/heritage/room-park.jpg",
     },
     {
       id: "collaboration-2",
@@ -23,7 +22,6 @@ export function seedRooms(): Room[] {
       capacity: 6,
       floor: "Level 2",
       equipment: ["TV", "HDMI"],
-      image: "/heritage/room-suite.jpg",
     },
     {
       id: "hub-studio",
@@ -32,7 +30,6 @@ export function seedRooms(): Room[] {
       capacity: 20,
       floor: "Ground",
       equipment: ["Projector", "Mic", "Teams Room"],
-      image: "/heritage/room-dusk.jpg",
     },
     {
       id: "quiet-room",
@@ -41,7 +38,6 @@ export function seedRooms(): Room[] {
       capacity: 4,
       floor: "Level 2",
       equipment: ["Phone"],
-      image: "/heritage/room-exec.jpg",
     },
   ];
 }
@@ -106,7 +102,6 @@ export function seedHub(): HubStory[] {
       publishedAt: new Date().toISOString(),
       author: "HSH Hub",
       href: "https://hub.hsh.example/induction",
-      image: "/heritage/stairs.jpg",
     },
     {
       id: "hub-2",
@@ -116,7 +111,6 @@ export function seedHub(): HubStory[] {
       publishedAt: new Date(Date.now() - 3_600_000).toISOString(),
       author: "Workplace",
       href: "https://hub.hsh.example/cafeteria",
-      image: "/heritage/arcade.jpg",
     },
     {
       id: "hub-3",
@@ -126,7 +120,6 @@ export function seedHub(): HubStory[] {
       publishedAt: new Date(Date.now() - 86_400_000).toISOString(),
       author: "IT",
       href: "https://hub.hsh.example/teams-rooms",
-      image: "/heritage/guestroom.jpg",
     },
   ];
 }

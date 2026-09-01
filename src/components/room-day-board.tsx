@@ -122,34 +122,25 @@ export function RoomDayBoard() {
             return (
               <div
                 key={room.id}
-                className="relative h-36 overflow-hidden border-b border-l border-[#d9cdb8]"
+                className="border-b border-l border-[#d9cdb8] bg-white px-3 py-3"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={room.image}
-                  alt=""
-                  className="absolute inset-0 size-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#004b49] via-[#004b49]/55 to-black/10" />
-                <div className="relative z-10 flex h-full flex-col justify-end p-3 text-white">
-                  <p
-                    className="text-lg leading-tight"
-                    style={{ fontFamily: "var(--font-cormorant), serif" }}
-                  >
-                    {room.name}
-                  </p>
-                  <p className="text-[10px] tracking-[0.12em] text-white/75 uppercase">
-                    {room.capacity} seats · {room.floor}
-                  </p>
-                  <p
-                    className={cn(
-                      "mt-1 text-[10px] font-medium tracking-[0.08em] uppercase",
-                      status.busy ? "text-[#e8c4c4]" : "text-[#c5a44e]",
-                    )}
-                  >
-                    {status.label}
-                  </p>
-                </div>
+                <p
+                  className="text-lg leading-tight text-[#004b49]"
+                  style={{ fontFamily: "var(--font-cormorant), serif" }}
+                >
+                  {room.name}
+                </p>
+                <p className="text-[10px] tracking-[0.12em] text-[#6b6458] uppercase">
+                  {room.capacity} seats · {room.floor}
+                </p>
+                <p
+                  className={cn(
+                    "mt-1 text-[10px] font-medium tracking-[0.08em] uppercase",
+                    status.busy ? "text-[#9b2c2c]" : "text-[#004b49]",
+                  )}
+                >
+                  {status.label}
+                </p>
               </div>
             );
           })}

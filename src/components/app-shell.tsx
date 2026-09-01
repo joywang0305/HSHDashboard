@@ -23,7 +23,7 @@ function NavLinks({
 }) {
   const pathname = usePathname();
   return (
-    <nav className={cn("flex items-center gap-8", className)}>
+    <nav className={cn("flex items-center gap-7", className)}>
       {nav.map((item) => {
         const active =
           item.href === "/"
@@ -37,13 +37,13 @@ function NavLinks({
             className={cn(
               "relative py-1 text-[11px] font-medium tracking-[0.28em] uppercase transition-colors",
               active
-                ? "text-[#c5a44e]"
-                : "text-white/75 hover:text-white",
+                ? "text-[#004b49]"
+                : "text-[#6b6458] hover:text-[#004b49]",
             )}
           >
             {item.label}
             {active ? (
-              <span className="absolute inset-x-0 -bottom-2 h-px bg-[#c5a44e]" />
+              <span className="absolute inset-x-0 -bottom-1.5 h-px bg-[#c5a44e]" />
             ) : null}
           </Link>
         );
@@ -54,16 +54,13 @@ function NavLinks({
 
 function Wordmark() {
   return (
-    <Link href="/" className="group flex flex-col items-center text-center">
-      <span className="text-[9px] tracking-[0.55em] text-[#c5a44e]">THE</span>
+    <Link href="/" className="flex items-baseline gap-2 whitespace-nowrap">
+      <span className="text-[10px] tracking-[0.42em] text-[#c5a44e]">THE</span>
       <span
-        className="mt-0.5 text-[22px] leading-none tracking-[0.42em] text-white"
+        className="text-[18px] leading-none tracking-[0.38em] text-[#004b49]"
         style={{ fontFamily: "var(--font-cinzel), serif" }}
       >
         HSH
-      </span>
-      <span className="mt-1 text-[8px] tracking-[0.48em] text-white/70">
-        DASHBOARD
       </span>
     </Link>
   );
@@ -90,36 +87,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-full bg-[#f7f3eb]">
-      <header className="sticky top-0 z-40 border-b border-[#c5a44e] bg-[#004b49] text-white">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-4 md:px-8">
-          <div className="flex items-center gap-3">
+    <div className="flex min-h-full flex-col bg-[#f7f3eb]">
+      <header className="sticky top-0 z-40 border-b border-[#d9cdb8] bg-white">
+        <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 md:px-8">
+          <div className="flex items-center gap-4">
             <button
               type="button"
-              className="border border-[#c5a44e]/60 p-2 text-[#c5a44e] md:hidden"
+              className="p-2 text-[#004b49] md:hidden"
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="size-4" />
               <span className="sr-only">Open menu</span>
             </button>
-            <div className="hidden min-w-0 md:block">
-              <p className="text-[11px] tracking-[0.22em] text-[#c5a44e] uppercase">
-                {clock}
-              </p>
-              <p className="mt-0.5 text-[10px] tracking-[0.16em] text-white/55 uppercase">
-                {board
-                  ? board.source === "graph"
-                    ? "Outlook live"
-                    : "Outlook mock"
-                  : "Board"}
-              </p>
-            </div>
+            <NavLinks className="hidden md:flex" />
           </div>
           <Wordmark />
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-4">
+            <p className="hidden text-[10px] tracking-[0.18em] text-[#6b6458] uppercase sm:block">
+              {clock}
+              {board
+                ? ` · ${board.source === "graph" ? "Outlook" : "Outlook mock"}`
+                : ""}
+            </p>
             <button
               type="button"
-              className="border border-[#c5a44e] px-3 py-2 text-[10px] font-medium tracking-[0.22em] text-[#c5a44e] uppercase transition-colors hover:bg-[#c5a44e] hover:text-[#004b49]"
+              className="text-[10px] font-medium tracking-[0.22em] text-[#004b49] uppercase hover:text-[#c5a44e]"
               onClick={() => {
                 void resetDemo().then(() =>
                   toast.success("Demo board restored"),
@@ -130,24 +122,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         </div>
-        <div className="hidden justify-center border-t border-[#c5a44e]/30 py-3 md:flex">
-          <NavLinks />
-        </div>
       </header>
       {mobileOpen ? (
         <div className="fixed inset-0 z-50 md:hidden">
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-black/45"
+            className="absolute inset-0 bg-black/35"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-[#004b49] p-6">
+          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-white p-6">
             <div className="mb-8 flex items-center justify-between">
               <Wordmark />
               <button
                 type="button"
-                className="p-2 text-[#c5a44e]"
+                className="p-2 text-[#004b49]"
                 onClick={() => setMobileOpen(false)}
               >
                 <X className="size-4" />
@@ -160,7 +149,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       ) : null}
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
+      <footer className="bg-[#5c5c5c] text-[#f3f3f3]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8">
+          <p
+            className="text-[12px] tracking-[0.28em] uppercase"
+            style={{ fontFamily: "var(--font-cinzel), serif" }}
+          >
+            HSH Dashboard
+          </p>
+          <p className="text-[11px] tracking-[0.08em] text-white/75">
+            One URL for every kiosk · Outlook remains the source of truth
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
