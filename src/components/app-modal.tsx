@@ -36,7 +36,7 @@ export function AppModal({
       <button
         type="button"
         aria-label="Close dialog"
-        className="absolute inset-0 bg-black/20"
+        className="absolute inset-0 bg-black/25"
         onClick={onClose}
       />
       <div
@@ -58,7 +58,10 @@ export function AppModal({
         </div>
         <button
           type="button"
-          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "absolute top-2 right-2")}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon-sm" }),
+            "absolute top-2 right-2",
+          )}
           onClick={onClose}
         >
           <XIcon />

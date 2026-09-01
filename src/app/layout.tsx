@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "HSH Dashboard",
   description:
-    "Health, Safety & Hygiene board for Northline Works — incidents, inspections, and corrective actions.",
+    "Shared kiosk board for HSH meeting rooms, Hub stories, and SharePoint — Outlook holds the calendars.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -25,7 +25,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
     >
       <body className="min-h-full font-sans">
         <Providers>

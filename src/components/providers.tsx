@@ -1,16 +1,13 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/components/ui/sonner";
-import { StoreProvider } from "@/lib/store";
+import { Toaster } from "sonner";
+import { BoardProvider } from "@/components/board-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <StoreProvider>
-        {children}
-        <Toaster />
-      </StoreProvider>
-    </ThemeProvider>
+    <BoardProvider>
+      {children}
+      <Toaster theme="light" />
+    </BoardProvider>
   );
 }

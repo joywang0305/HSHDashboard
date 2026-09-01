@@ -1,18 +1,27 @@
 # HSH Dashboard
 
-Health, Safety & Hygiene board for **Northline Works**. Site leads log incidents, close out inspections, and track corrective actions without waiting on a spreadsheet.
+Shared kiosk board for **HSH** workplaces. Every wall PC opens the same URL.
 
-This first slice is a working local app with seeded site data. Reports you add are stored in the browser (`localStorage`) so the board stays usable without a database.
+1. **Rooms** — today’s Outlook meeting-room calendars, with on-the-spot booking
+2. **HSH Hub** — workplace notices
+3. **SharePoint** — recent site files and pages
 
-## What you can do
+Outlook (Exchange room mailboxes) remains the system of record for bookings. This app is the shared display and the kiosk booking surface.
 
-- Scan open incidents, overdue inspections, LTI-free days, and hygiene scores on the overview.
-- File a new incident from any page.
-- Filter the incident board and move a report from open → investigating → closed.
-- Mark an inspection complete with a 0–100 score.
-- Close corrective actions, including overdue items.
+## Architecture
 
-Use **Maya Chen → Restore demo data** in the header if you want the original sample board back.
+```
+Kiosk PCs (Chrome kiosk)  →  this web app  →  /api/board  (poll every 12s)
+                                            →  /api/bookings (create)
+                                            →  Microsoft Graph when configured
+                                               (room calendars + SharePoint)
+                                            →  HSH Hub API when configured
+```
+
+- All PCs load one hosted URL. None of them talk to Outlook directly.
+- The board feed is server-side, so a booking made at reception appears on every screen on the next poll.
+- Today the feed is an in-memory mock of Graph. Put Graph credentials in the environment and the same routes can call `/users/{room}/calendar/calendarView` and `POST /users/{room}/events`.
+- Firebase Hosting can serve this UI; Cloud Functions can replace the Next.js route handlers; Firestore can replace the in-memory cache so many Cloud Functions instances stay in sync. Do not store bookings only in Firebase — write them to Outlook.
 
 ## Run locally
 
@@ -23,11 +32,16 @@ npm run dev
 
 Open [http://localhost:43127](http://localhost:43127).
 
-```bash
-npm run build
-npm start
-```
+Tap a free slot on a room column, enter a title and your name, and book. Use **Restore demo** to reset sample Outlook events.
 
-## Stack
+Kiosk PCs: open that URL fullscreen (Chrome `--kiosk`). They do not need a Microsoft login.
 
-Next.js (App Router), TypeScript, Tailwind CSS, and shadcn/ui. No auth or backend in this slice.
+## Connect Outlook later
+
+Copy `.env.example` to `.env.local` and register an Entra ID app with application permissions:
+
+- `Calendars.ReadWrite` on the room mailboxes
+- `Place.Read.All`
+- `Sites.Read.All` (SharePoint)
+
+Until those values exist, the board uses the mock Graph adapter (`source: mock` in the header).
