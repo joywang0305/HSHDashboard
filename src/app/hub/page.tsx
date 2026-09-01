@@ -11,7 +11,6 @@ export default function HubPage() {
         eyebrow="HSH Hub"
         title="Workplace notices"
         lede="Stories from HSH Hub, shown the same way on every wall PC."
-        compact
       />
       <SectionFrame>
         <HubFeed />

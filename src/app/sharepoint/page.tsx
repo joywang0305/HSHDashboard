@@ -11,7 +11,6 @@ export default function SharePointPage() {
         eyebrow="SharePoint"
         title="Site files and pages"
         lede="Recent documents and pages from the HSH SharePoint site, read through Microsoft Graph."
-        compact
       />
       <SectionFrame>
         <SharePointFeed />
