@@ -11,7 +11,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { LogIncidentButton } from "@/components/log-incident-dialog";
 import { useStore } from "@/lib/store";
@@ -118,13 +117,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="md:pl-64">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-stone-200/80 bg-[#f4f1ea]/90 px-4 py-3 backdrop-blur md:px-8">
+          <Button
+            variant="outline"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu />
+            <span className="sr-only">Open menu</span>
+          </Button>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger
-              render={<Button variant="outline" size="icon" className="md:hidden" />}
-            >
-              <Menu />
-              <span className="sr-only">Open menu</span>
-            </SheetTrigger>
             <SheetContent
               side="left"
               className="w-72 border-teal-950/40 bg-[#12352f] p-4 text-white"
@@ -141,7 +143,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="ml-auto flex items-center gap-2">
             <LogIncidentButton />
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" />}>
+              <DropdownMenuTrigger
+                className={buttonVariants({ variant: "outline" })}
+              >
                 Maya Chen
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-52">

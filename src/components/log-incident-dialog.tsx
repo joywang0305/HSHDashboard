@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,17 +96,18 @@ export function LogIncidentButton({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (!next) reset();
-      }}
-    >
-      <DialogTrigger render={<Button variant={variant} />}>
+    <>
+      <Button variant={variant} onClick={() => setOpen(true)}>
         Log incident
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      </Button>
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) reset();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Log an incident</DialogTitle>
           <DialogDescription>
@@ -245,6 +245,7 @@ export function LogIncidentButton({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </>
   );
 }
