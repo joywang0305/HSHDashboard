@@ -69,7 +69,7 @@ export function DayIntro({
         {eyebrow}
       </p>
       <span className="my-3 mx-auto block h-px w-16 bg-[#c5a44e]" />
-      <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+      <div className="flex items-center justify-center gap-3 md:gap-5">
         <button
           type="button"
           aria-label="Previous day"
@@ -78,25 +78,23 @@ export function DayIntro({
         >
           <ChevronLeft className="size-5" />
         </button>
-        <div className="min-w-0">
-          <h1
-            className="px-2 text-2xl font-medium italic leading-tight text-[#004b49] sm:text-3xl md:text-5xl"
-            style={{ fontFamily: "var(--font-cormorant), serif" }}
-          >
-            {formatDayLabel(date)}
-          </h1>
-          <input
-            ref={picker}
-            type="date"
-            value={date}
-            onChange={(event) => {
-              if (event.target.value) onPick(event.target.value);
-            }}
-            onClick={openPicker}
-            aria-label="Choose a date"
-            className="mx-auto mt-4 block h-11 border border-[#d9cdb8] bg-white px-3 text-sm text-[#004b49] outline-none focus:border-[#c5a44e]"
-          />
-        </div>
+        <h1
+          className="min-w-0 px-1 text-xl font-medium italic leading-tight text-[#004b49] sm:text-3xl md:text-5xl"
+          style={{ fontFamily: "var(--font-cormorant), serif" }}
+        >
+          {formatDayLabel(date)}
+        </h1>
+        <input
+          ref={picker}
+          type="date"
+          value={date}
+          onChange={(event) => {
+            if (event.target.value) onPick(event.target.value);
+          }}
+          onClick={openPicker}
+          aria-label="Choose a date"
+          className="h-11 w-[11.5rem] shrink-0 border border-[#d9cdb8] bg-white px-3 text-sm text-[#004b49] outline-none focus:border-[#c5a44e]"
+        />
         <button
           type="button"
           aria-label="Next day"
