@@ -28,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EmptyState, ErrorBanner, LoadingBlock } from "@/components/feedback";
+import { EmptyState, ErrorBanner } from "@/components/feedback";
 import { InspectionStatusBadge } from "@/components/status-badges";
 import { formatDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -45,7 +45,7 @@ import {
 } from "@/lib/types";
 
 export function InspectionsPage() {
-  const { inspections, hydrated, completeInspection } = useStore();
+  const { inspections, completeInspection } = useStore();
   const [site, setSite] = useState<Site | "all">("all");
   const [type, setType] = useState<InspectionType | "all">("all");
   const [status, setStatus] = useState<InspectionStatus | "all">("all");
@@ -60,10 +60,6 @@ export function InspectionsPage() {
       .filter((item) => (status === "all" ? true : item.status === status))
       .sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor));
   }, [inspections, site, type, status]);
-
-  if (!hydrated) {
-    return <LoadingBlock label="Loading inspections…" />;
-  }
 
   function submitScore() {
     if (!pending) return;

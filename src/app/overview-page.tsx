@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { EmptyState, LoadingBlock } from "@/components/feedback";
+import { EmptyState } from "@/components/feedback";
 import { IncidentTrend } from "@/components/incident-trend";
 import { KpiCard } from "@/components/kpi-card";
 import { LogIncidentButton } from "@/components/log-incident-dialog";
@@ -25,7 +25,7 @@ import { CATEGORY_LABELS } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function OverviewPage() {
-  const { incidents, inspections, actions, hydrated } = useStore();
+  const { incidents, inspections, actions } = useStore();
   const kpis = useKpis();
 
   const recent = [...incidents]
@@ -40,10 +40,6 @@ export function OverviewPage() {
       if (a.status !== b.status) return a.status === "overdue" ? -1 : 1;
       return a.due.localeCompare(b.due);
     });
-
-  if (!hydrated) {
-    return <LoadingBlock label="Loading the HSH board…" />;
-  }
 
   return (
     <div className="space-y-6">

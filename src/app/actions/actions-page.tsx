@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EmptyState, LoadingBlock } from "@/components/feedback";
+import { EmptyState } from "@/components/feedback";
 import { ActionStatusBadge, SeverityBadge } from "@/components/status-badges";
 import { formatDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -29,7 +29,7 @@ import {
 } from "@/lib/types";
 
 export function ActionsPage() {
-  const { actions, hydrated, completeAction } = useStore();
+  const { actions, completeAction } = useStore();
   const [status, setStatus] = useState<ActionStatus | "all">("all");
 
   const rows = useMemo(() => {
@@ -41,10 +41,6 @@ export function ActionsPage() {
         return a.due.localeCompare(b.due);
       });
   }, [actions, status]);
-
-  if (!hydrated) {
-    return <LoadingBlock label="Loading corrective actions…" />;
-  }
 
   return (
     <div className="space-y-5">

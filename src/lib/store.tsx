@@ -4,8 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
-  useSyncExternalStore,
+  useState,
   type ReactNode,
 } from "react";
 import { seedData, STORAGE_KEY } from "@/lib/seed-data";
@@ -30,7 +31,6 @@ type StoreValue = DashboardData & {
 };
 
 const StoreContext = createContext<StoreValue | null>(null);
-const CHANGE_EVENT = "hsh-dashboard-updated";
 
 function nextId(prefix: string, existing: { id: string }[]) {
   const max = existing.reduce((acc, item) => {
@@ -50,57 +50,39 @@ function isDashboardData(value: unknown): value is DashboardData {
   );
 }
 
-let cachedRaw: string | null | undefined;
-let cachedData: DashboardData = seedData;
-
 function readStore(): DashboardData {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw === cachedRaw) return cachedData;
-    cachedRaw = raw;
-    if (!raw) {
-      cachedData = seedData;
-      return cachedData;
-    }
+    if (!raw) return seedData;
     const parsed = JSON.parse(raw) as unknown;
-    cachedData = isDashboardData(parsed) ? parsed : seedData;
-    return cachedData;
+    if (isDashboardData(parsed)) return parsed;
   } catch {
-    cachedRaw = null;
-    cachedData = seedData;
-    return cachedData;
+    return seedData;
   }
-}
-
-function subscribe(onStoreChange: () => void) {
-  window.addEventListener("storage", onStoreChange);
-  window.addEventListener(CHANGE_EVENT, onStoreChange);
-  return () => {
-    window.removeEventListener("storage", onStoreChange);
-    window.removeEventListener(CHANGE_EVENT, onStoreChange);
-  };
-}
-
-function persist(next: DashboardData) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  window.dispatchEvent(new Event(CHANGE_EVENT));
-}
-
-function updateStore(updater: (current: DashboardData) => DashboardData) {
-  persist(updater(readStore()));
+  return seedData;
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const data = useSyncExternalStore(subscribe, readStore, () => seedData);
-  const hydrated = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
+  const [data, setData] = useState<DashboardData>(seedData);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Client-only read of saved board. Seed data is already on screen so a
+    // failed or delayed read never leaves the main area blank.
+    /* eslint-disable react-hooks/set-state-in-effect -- hydrate from localStorage after mount */
+    setData(readStore());
+    setHydrated(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }, [data, hydrated]);
 
   const addIncident = useCallback<StoreValue["addIncident"]>((input) => {
     let created: Incident | undefined;
-    updateStore((current) => {
+    setData((current) => {
       created = {
         ...input,
         id: nextId("INC", current.incidents),
@@ -117,7 +99,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const updateIncidentStatus = useCallback<StoreValue["updateIncidentStatus"]>(
     (id, status) => {
-      updateStore((current) => ({
+      setData((current) => ({
         ...current,
         incidents: current.incidents.map((item) =>
           item.id === id ? { ...item, status } : item,
@@ -129,7 +111,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const completeInspection = useCallback<StoreValue["completeInspection"]>(
     (id, score) => {
-      updateStore((current) => ({
+      setData((current) => ({
         ...current,
         inspections: current.inspections.map((item) =>
           item.id === id ? { ...item, status: "complete", score } : item,
@@ -140,7 +122,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const completeAction = useCallback<StoreValue["completeAction"]>((id) => {
-    updateStore((current) => ({
+    setData((current) => ({
       ...current,
       actions: current.actions.map((item) =>
         item.id === id ? { ...item, status: "done" } : item,
@@ -149,7 +131,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const reset = useCallback(() => {
-    persist(seedData);
+    setData(seedData);
   }, []);
 
   const value = useMemo<StoreValue>(

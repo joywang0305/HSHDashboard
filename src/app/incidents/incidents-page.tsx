@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EmptyState, LoadingBlock } from "@/components/feedback";
+import { EmptyState } from "@/components/feedback";
 import { LogIncidentButton } from "@/components/log-incident-dialog";
 import {
   IncidentStatusBadge,
@@ -42,7 +42,7 @@ import {
 } from "@/lib/types";
 
 export function IncidentsPage() {
-  const { incidents, hydrated, updateIncidentStatus } = useStore();
+  const { incidents, updateIncidentStatus } = useStore();
   const [query, setQuery] = useState("");
   const [site, setSite] = useState<Site | "all">("all");
   const [severity, setSeverity] = useState<Severity | "all">("all");
@@ -64,10 +64,6 @@ export function IncidentsPage() {
       );
     });
   }, [incidents, query, site, severity, status, category]);
-
-  if (!hydrated) {
-    return <LoadingBlock label="Loading incidents…" />;
-  }
 
   return (
     <div className="space-y-5">

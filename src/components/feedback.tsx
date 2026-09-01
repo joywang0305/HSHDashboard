@@ -41,9 +41,9 @@ export function LoadingBlock({ label = "Loading records…" }: { label?: string 
   return (
     <div className="space-y-3" aria-busy="true" aria-live="polite">
       <p className="sr-only">{label}</p>
-      <div className="h-24 animate-pulse rounded-xl bg-muted" />
-      <div className="h-24 animate-pulse rounded-xl bg-muted" />
-      <div className="h-40 animate-pulse rounded-xl bg-muted" />
+      <div className="h-24 animate-pulse rounded-xl bg-stone-300/80" />
+      <div className="h-24 animate-pulse rounded-xl bg-stone-300/80" />
+      <div className="h-40 animate-pulse rounded-xl bg-stone-300/80" />
     </div>
   );
 }
