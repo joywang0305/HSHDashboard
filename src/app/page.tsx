@@ -14,7 +14,7 @@ export default function RoomsPage() {
       <PageIntro
         eyebrow="Meeting rooms"
         title={board ? formatDayLabel(board.date) : "Today’s rooms"}
-        lede="Live Outlook calendars for every HSH room, on every wall PC. Tap a free slot to book without opening a laptop."
+        lede="Live Outlook calendars for every meeting room, on every wall PC. Tap a free slot to book without opening a laptop."
       />
       <SectionFrame>
         <StripNews />

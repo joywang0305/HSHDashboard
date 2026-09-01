@@ -1,6 +1,6 @@
-# HSH Dashboard
+# The Hongkong and Shanghai Hotels Limited
 
-Shared kiosk board for **HSH** workplaces. Every wall PC opens the same URL.
+Shared kiosk board for **The Hongkong and Shanghai Hotels Limited** (HSH) workplaces. Every wall PC opens the same URL.
 
 The chrome follows The Peninsula homepage: a single-row white header with a centered wordmark, and a gray footer panel. Pages stay typographic — no photography — so a wall PC reads as a concierge board rather than a gallery.
 

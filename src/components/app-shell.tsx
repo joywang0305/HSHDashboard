@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { toast } from "sonner";
+import { COMPANY_NAME } from "@/lib/brand";
 import { useBoard } from "@/components/board-provider";
 import { cn } from "@/lib/utils";
 
@@ -54,13 +55,12 @@ function NavLinks({
 
 function Wordmark() {
   return (
-    <Link href="/" className="flex items-baseline gap-2 whitespace-nowrap">
-      <span className="text-[10px] tracking-[0.42em] text-[#c5a44e]">THE</span>
+    <Link href="/" className="min-w-0 px-2 text-center">
       <span
-        className="text-[18px] leading-none tracking-[0.38em] text-[#004b49]"
+        className="block text-[10px] leading-snug tracking-[0.12em] text-[#004b49] uppercase sm:text-[11px] sm:tracking-[0.16em] md:text-[12px] md:tracking-[0.2em]"
         style={{ fontFamily: "var(--font-cinzel), serif" }}
       >
-        HSH
+        {COMPANY_NAME}
       </span>
     </Link>
   );
@@ -89,7 +89,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-full flex-col bg-[#f7f3eb]">
       <header className="sticky top-0 z-40 border-b border-[#d9cdb8] bg-white">
-        <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 md:px-8">
+        <div className="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 md:px-8">
           <div className="flex items-center gap-4">
             <button
               type="button"
@@ -153,10 +153,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <footer className="bg-[#5c5c5c] text-[#f3f3f3]">
         <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8">
           <p
-            className="text-[12px] tracking-[0.28em] uppercase"
+            className="text-[12px] tracking-[0.08em]"
             style={{ fontFamily: "var(--font-cinzel), serif" }}
           >
-            HSH Dashboard
+            {COMPANY_NAME}
           </p>
           <p className="text-[11px] tracking-[0.08em] text-white/75">
             One URL for every kiosk · Outlook remains the source of truth

@@ -9,7 +9,7 @@ export default function SharePointPage() {
       <PageIntro
         eyebrow="SharePoint"
         title="Site files and pages"
-        lede="Recent documents and pages from the HSH SharePoint site, read through Microsoft Graph."
+        lede="Recent documents and pages from the SharePoint site, read through Microsoft Graph."
       />
       <SectionFrame>
         <SharePointFeed />
