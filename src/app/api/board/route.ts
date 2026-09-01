@@ -3,6 +3,7 @@ import { getBoard } from "@/lib/board-store";
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  return NextResponse.json(getBoard());
+export function GET(request: Request) {
+  const date = new URL(request.url).searchParams.get("date");
+  return NextResponse.json(getBoard(date));
 }

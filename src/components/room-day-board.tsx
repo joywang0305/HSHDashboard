@@ -12,6 +12,7 @@ import {
   isoFromDateAndMinutes,
   minutesFromMidnight,
   rangesOverlap,
+  todayInZone,
 } from "@/lib/time";
 import type { Booking, Room } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -23,20 +24,30 @@ const HOURS = Array.from(
 const TOTAL_MINUTES = (DAY_END_HOUR - DAY_START_HOUR) * 60;
 const HOUR_PX = 64;
 
-function roomStatus(roomId: string, bookings: Booking[], now: Date) {
-  const current = bookings.find(
-    (item) =>
-      item.roomId === roomId &&
-      new Date(item.start) <= now &&
-      new Date(item.end) > now,
+function roomStatus(
+  roomId: string,
+  bookings: Booking[],
+  now: Date,
+  viewingToday: boolean,
+) {
+  const roomBookings = bookings.filter((item) => item.roomId === roomId);
+  if (!viewingToday) {
+    if (roomBookings.length === 0) {
+      return { label: "No meetings booked", busy: false };
+    }
+    return {
+      label: `${roomBookings.length} meeting${roomBookings.length === 1 ? "" : "s"}`,
+      busy: false,
+    };
+  }
+  const current = roomBookings.find(
+    (item) => new Date(item.start) <= now && new Date(item.end) > now,
   );
   if (current) {
     return { label: `Busy until ${formatClock(current.end)}`, busy: true };
   }
-  const next = bookings
-    .filter(
-      (item) => item.roomId === roomId && new Date(item.start) > now,
-    )
+  const next = roomBookings
+    .filter((item) => new Date(item.start) > now)
     .sort((a, b) => a.start.localeCompare(b.start))[0];
   if (next) {
     return { label: `Free until ${formatClock(next.start)}`, busy: false };
@@ -48,6 +59,7 @@ export function RoomDayBoard() {
   const { board, loading, error } = useBoard();
   const [now, setNow] = useState(() => new Date());
   const [draft, setDraft] = useState<SlotDraft | null>(null);
+  const viewingToday = board?.date === todayInZone();
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -118,7 +130,12 @@ export function RoomDayBoard() {
             Time
           </div>
           {board.rooms.map((room) => {
-            const status = roomStatus(room.id, board.bookings, now);
+            const status = roomStatus(
+              room.id,
+              board.bookings,
+              now,
+              viewingToday,
+            );
             return (
               <div
                 key={room.id}
@@ -183,7 +200,8 @@ export function RoomDayBoard() {
             );
           })}
 
-          {nowMinutes >= DAY_START_HOUR * 60 &&
+          {viewingToday &&
+          nowMinutes >= DAY_START_HOUR * 60 &&
           nowMinutes <= DAY_END_HOUR * 60 ? (
             <div
               className="pointer-events-none absolute right-0 left-0 z-10"

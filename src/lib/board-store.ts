@@ -1,5 +1,5 @@
 import { seedBookings, seedHub, seedRooms, seedSharePoint } from "@/lib/seed";
-import { rangesOverlap, todayInZone } from "@/lib/time";
+import { dateOfInstant, isIsoDate, rangesOverlap, todayInZone } from "@/lib/time";
 import type {
   BoardPayload,
   Booking,
@@ -45,14 +45,18 @@ function state() {
   return globalState.__hshBoard;
 }
 
-export function getBoard(): BoardPayload {
+export function getBoard(viewDate?: string | null): BoardPayload {
   const current = state();
+  const date = isIsoDate(viewDate) ? viewDate : current.date;
+  const bookings = current.bookings.filter(
+    (item) => dateOfInstant(item.start) === date,
+  );
   return {
-    date: current.date,
+    date,
     timezone: TIMEZONE,
     source: isGraphConfigured() ? "graph" : "mock",
     rooms: current.rooms,
-    bookings: current.bookings,
+    bookings,
     hub: current.hub,
     sharepoint: current.sharepoint,
     dayStartHour: DAY_START_HOUR,

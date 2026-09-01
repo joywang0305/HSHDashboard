@@ -1,8 +1,9 @@
 import type { Booking, HubStory, Room, SharePointItem } from "@/lib/types";
-import { todayInZone } from "@/lib/time";
+import { todayInZone, zonedDateTime } from "@/lib/time";
 
 function at(date: string, time: string) {
-  return new Date(`${date}T${time}:00`).toISOString();
+  const [hour, minute] = time.split(":").map(Number);
+  return zonedDateTime(date, hour, minute).toISOString();
 }
 
 export function seedRooms(): Room[] {

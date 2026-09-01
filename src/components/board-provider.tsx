@@ -9,11 +9,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { POLL_MS } from "@/lib/time";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { isIsoDate, POLL_MS, todayInZone } from "@/lib/time";
 import type { BoardPayload, CreateBookingInput } from "@/lib/types";
 
 type BoardContextValue = {
   board: BoardPayload | null;
+  viewDate: string;
+  setViewDate: (date: string) => void;
   error: string | null;
   loading: boolean;
   refresh: () => Promise<void>;
@@ -24,13 +27,39 @@ type BoardContextValue = {
 const BoardContext = createContext<BoardContextValue | null>(null);
 
 export function BoardProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const requested = searchParams.get("date");
+  const viewDate = isIsoDate(requested) ? requested : todayInZone();
+
   const [board, setBoard] = useState<BoardPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const setViewDate = useCallback(
+    (date: string) => {
+      if (!isIsoDate(date)) return;
+      const params = new URLSearchParams(searchParams.toString());
+      if (date === todayInZone()) {
+        params.delete("date");
+      } else {
+        params.set("date", date);
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams],
+  );
+
   const refresh = useCallback(async () => {
     try {
-      const response = await fetch("/api/board", { cache: "no-store" });
+      const response = await fetch(
+        `/api/board?date=${encodeURIComponent(viewDate)}`,
+        { cache: "no-store" },
+      );
       if (!response.ok) {
         throw new Error("The board feed is unavailable.");
       }
@@ -44,7 +73,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [viewDate]);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- load and poll the shared board feed */
@@ -78,8 +107,17 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const value = useMemo(
-    () => ({ board, error, loading, refresh, book, resetDemo }),
-    [board, error, loading, refresh, book, resetDemo],
+    () => ({
+      board,
+      viewDate,
+      setViewDate,
+      error,
+      loading,
+      refresh,
+      book,
+      resetDemo,
+    }),
+    [board, viewDate, setViewDate, error, loading, refresh, book, resetDemo],
   );
 
   return (

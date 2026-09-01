@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cinzel, Cormorant_Garamond, Outfit } from "next/font/google";
+import { Suspense } from "react";
 import { COMPANY_NAME } from "@/lib/brand";
 import { AppShell } from "@/components/app-shell";
 import { Providers } from "@/components/providers";
@@ -38,9 +39,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${outfit.variable} ${cormorant.variable} ${cinzel.variable} h-full`}
     >
       <body className="min-h-full font-sans">
-        <Providers>
-          <AppShell>{children}</AppShell>
-        </Providers>
+        <Suspense>
+          <Providers>
+            <AppShell>{children}</AppShell>
+          </Providers>
+        </Suspense>
       </body>
     </html>
   );

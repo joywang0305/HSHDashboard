@@ -36,6 +36,8 @@ Open [http://localhost:43127](http://localhost:43127).
 
 Tap a free slot on a room column, enter a title and your name, and book. Use **Restore demo** to reset sample Outlook events.
 
+Use **<** and **>** beside the date to move one day at a time, or tap the date to pick another day. Other days start empty in the mock until someone books them.
+
 Kiosk PCs: open that URL fullscreen (Chrome `--kiosk`). They do not need a Microsoft login.
 
 ## Connect Outlook later
