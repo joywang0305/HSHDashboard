@@ -2,14 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { buttonVariants } from "@/components/ui/button";
+import { NativeSelect } from "@/components/native-select";
 import {
   Table,
   TableBody,
@@ -54,24 +48,21 @@ export function ActionsPage() {
             items stay at the top until someone owns the close-out.
           </p>
         </div>
-        <Select
+        <NativeSelect
+          aria-label="Filter by status"
+          className="w-44"
           value={status}
-          onValueChange={(value) => {
-            if (value) setStatus(value as ActionStatus | "all");
-          }}
+          onChange={(event) =>
+            setStatus(event.target.value as ActionStatus | "all")
+          }
         >
-          <SelectTrigger className="w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {ACTION_STATUSES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {ACTION_STATUS_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <option value="all">All statuses</option>
+          {ACTION_STATUSES.map((item) => (
+            <option key={item} value={item}>
+              {ACTION_STATUS_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
       </div>
 
       {rows.length === 0 ? (
@@ -111,16 +102,16 @@ export function ActionsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {action.status !== "done" ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
+                        type="button"
+                        className={buttonVariants({ variant: "outline", size: "sm" })}
                         onClick={() => {
                           completeAction(action.id);
                           toast.success(`${action.id} closed out`);
                         }}
                       >
                         Mark done
-                      </Button>
+                      </button>
                     ) : (
                       <span className="text-xs text-muted-foreground">
                         Closed

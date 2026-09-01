@@ -2,24 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { AppModal } from "@/components/app-modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { NativeSelect } from "@/components/native-select";
 import {
   Table,
   TableBody,
@@ -87,60 +74,46 @@ export function InspectionsPage() {
       </div>
 
       <div className="grid gap-2 md:grid-cols-3">
-        <Select
+        <NativeSelect
+          aria-label="Filter by site"
           value={site}
-          onValueChange={(value) => {
-            if (value) setSite(value as Site | "all");
-          }}
+          onChange={(event) => setSite(event.target.value as Site | "all")}
         >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All sites</SelectItem>
-            {SITES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {item}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          <option value="all">All sites</option>
+          {SITES.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          aria-label="Filter by type"
           value={type}
-          onValueChange={(value) => {
-            if (value) setType(value as InspectionType | "all");
-          }}
+          onChange={(event) =>
+            setType(event.target.value as InspectionType | "all")
+          }
         >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            {INSPECTION_TYPES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {INSPECTION_TYPE_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          <option value="all">All types</option>
+          {INSPECTION_TYPES.map((item) => (
+            <option key={item} value={item}>
+              {INSPECTION_TYPE_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          aria-label="Filter by status"
           value={status}
-          onValueChange={(value) => {
-            if (value) setStatus(value as InspectionStatus | "all");
-          }}
+          onChange={(event) =>
+            setStatus(event.target.value as InspectionStatus | "all")
+          }
         >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {INSPECTION_STATUSES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {INSPECTION_STATUS_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <option value="all">All statuses</option>
+          {INSPECTION_STATUSES.map((item) => (
+            <option key={item} value={item}>
+              {INSPECTION_STATUS_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
       </div>
 
       {rows.length === 0 ? (
@@ -184,9 +157,9 @@ export function InspectionsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {inspection.status !== "complete" ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
+                        type="button"
+                        className={buttonVariants({ variant: "outline", size: "sm" })}
                         onClick={() => {
                           setPending(inspection);
                           setScore("85");
@@ -194,7 +167,7 @@ export function InspectionsPage() {
                         }}
                       >
                         Mark complete
-                      </Button>
+                      </button>
                     ) : (
                       <span className="text-xs text-muted-foreground">
                         Filed
@@ -208,41 +181,39 @@ export function InspectionsPage() {
         </div>
       )}
 
-      <Dialog
+      <AppModal
         open={pending !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setPending(null);
-            setError(null);
-          }
+        onClose={() => {
+          setPending(null);
+          setError(null);
         }}
+        title="Record inspection score"
+        description={
+          pending ? `${pending.title} · ${pending.site}` : "Choose a walk first."
+        }
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Record inspection score</DialogTitle>
-            <DialogDescription>
-              {pending
-                ? `${pending.title} · ${pending.site}`
-                : "Choose a walk first."}
-            </DialogDescription>
-          </DialogHeader>
-          {error ? <ErrorBanner message={error} /> : null}
-          <div className="grid gap-1.5">
-            <Label htmlFor="inspection-score">Score (0–100)</Label>
-            <Input
-              id="inspection-score"
-              type="number"
-              min={0}
-              max={100}
-              value={score}
-              onChange={(event) => setScore(event.target.value)}
-            />
-          </div>
-          <DialogFooter>
-            <Button onClick={submitScore}>Save score</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {error ? <ErrorBanner message={error} /> : null}
+        <div className="grid gap-1.5">
+          <Label htmlFor="inspection-score">Score (0–100)</Label>
+          <Input
+            id="inspection-score"
+            type="number"
+            min={0}
+            max={100}
+            value={score}
+            onChange={(event) => setScore(event.target.value)}
+          />
+        </div>
+        <div className="-mx-4 -mb-4 flex justify-end border-t bg-muted/50 p-4">
+          <button
+            type="button"
+            className={buttonVariants()}
+            onClick={submitScore}
+          >
+            Save score
+          </button>
+        </div>
+      </AppModal>
     </div>
   );
 }

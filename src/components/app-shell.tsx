@@ -11,21 +11,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { buttonVariants } from "@/components/ui/button";
 import { LogIncidentButton } from "@/components/log-incident-dialog";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -117,50 +103,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
       <div className="md:pl-64">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-stone-200/80 bg-[#f4f1ea]/90 px-4 py-3 backdrop-blur md:px-8">
-          <Button
-            variant="outline"
-            size="icon"
-            className="md:hidden"
+          <button
+            type="button"
+            className={cn(buttonVariants({ variant: "outline", size: "icon" }), "md:hidden")}
             onClick={() => setMobileOpen(true)}
           >
             <Menu />
             <span className="sr-only">Open menu</span>
-          </Button>
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetContent
-              side="left"
-              className="w-72 border-teal-950/40 bg-[#12352f] p-4 text-white"
-            >
-              <SheetHeader className="sr-only">
-                <SheetTitle>HSH navigation</SheetTitle>
-              </SheetHeader>
-              <SidebarBody onNavigate={() => setMobileOpen(false)} />
-            </SheetContent>
-          </Sheet>
+          </button>
+          {mobileOpen ? (
+            <div className="fixed inset-0 z-50 md:hidden">
+              <button
+                type="button"
+                aria-label="Close menu"
+                className="absolute inset-0 bg-black/30"
+                onClick={() => setMobileOpen(false)}
+              />
+              <div className="absolute inset-y-0 left-0 w-72 bg-[#12352f] p-4 shadow-lg">
+                <SidebarBody onNavigate={() => setMobileOpen(false)} />
+              </div>
+            </div>
+          ) : null}
           <div className="md:hidden">
             <Brand />
           </div>
           <div className="ml-auto flex items-center gap-2">
             <LogIncidentButton />
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={buttonVariants({ variant: "outline" })}
-              >
-                Maya Chen
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-52">
-                <DropdownMenuLabel>HSE Lead · Northline</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    reset();
-                    toast.success("Demo data restored");
-                  }}
-                >
-                  Restore demo data
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <span className="hidden text-sm text-muted-foreground sm:inline">
+              Maya Chen · HSE Lead
+            </span>
+            <button
+              type="button"
+              className={buttonVariants({ variant: "outline" })}
+              onClick={() => {
+                reset();
+                toast.success("Demo data restored");
+              }}
+            >
+              Restore demo data
+            </button>
           </div>
         </header>
         <main className="px-4 py-6 md:px-8 md:py-8">{children}</main>

@@ -1,25 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { buttonVariants } from "@/components/ui/button";
+import { AppModal } from "@/components/app-modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { NativeSelect } from "@/components/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { ErrorBanner } from "@/components/feedback";
 import { useStore } from "@/lib/store";
@@ -52,14 +39,6 @@ export function LogIncidentButton({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState<string | null>(null);
-
-  const canSubmit = useMemo(
-    () =>
-      form.title.trim().length > 3 &&
-      form.reportedBy.trim().length > 1 &&
-      form.description.trim().length > 8,
-    [form],
-  );
 
   function reset() {
     setForm(emptyForm);
@@ -97,24 +76,22 @@ export function LogIncidentButton({
 
   return (
     <>
-      <Button variant={variant} onClick={() => setOpen(true)}>
-        Log incident
-      </Button>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) reset();
-        }}
+      <button
+        type="button"
+        className={buttonVariants({ variant })}
+        onClick={() => setOpen(true)}
       >
-        <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Log an incident</DialogTitle>
-          <DialogDescription>
-            File a near miss, injury, hygiene failure, or property event. Keep
-            it factual — investigation details can follow.
-          </DialogDescription>
-        </DialogHeader>
+        Log incident
+      </button>
+      <AppModal
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          reset();
+        }}
+        title="Log an incident"
+        description="File a near miss, injury, hygiene failure, or property event. Keep it factual — investigation details can follow."
+      >
         <form
           className="grid gap-3"
           onSubmit={(event) => {
@@ -139,75 +116,63 @@ export function LogIncidentButton({
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
-              <Label>Site</Label>
-              <Select
+              <Label htmlFor="incident-site">Site</Label>
+              <NativeSelect
+                id="incident-site"
                 value={form.site}
-                onValueChange={(value) => {
-                  if (!value) return;
-                  setForm((current) => ({ ...current, site: value as Site }));
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SITES.map((site) => (
-                    <SelectItem key={site} value={site}>
-                      {site}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-1.5">
-              <Label>Category</Label>
-              <Select
-                value={form.category}
-                onValueChange={(value) => {
-                  if (!value) return;
+                onChange={(event) =>
                   setForm((current) => ({
                     ...current,
-                    category: value as IncidentCategory,
-                  }));
-                }}
+                    site: event.target.value as Site,
+                  }))
+                }
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INCIDENT_CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {CATEGORY_LABELS[category]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {SITES.map((site) => (
+                  <option key={site} value={site}>
+                    {site}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="incident-category">Category</Label>
+              <NativeSelect
+                id="incident-category"
+                value={form.category}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    category: event.target.value as IncidentCategory,
+                  }))
+                }
+              >
+                {INCIDENT_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {CATEGORY_LABELS[category]}
+                  </option>
+                ))}
+              </NativeSelect>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
-              <Label>Severity</Label>
-              <Select
+              <Label htmlFor="incident-severity">Severity</Label>
+              <NativeSelect
+                id="incident-severity"
                 value={form.severity}
-                onValueChange={(value) => {
-                  if (!value) return;
+                onChange={(event) =>
                   setForm((current) => ({
                     ...current,
-                    severity: value as Severity,
-                  }));
-                }}
+                    severity: event.target.value as Severity,
+                  }))
+                }
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SEVERITIES.map((severity) => (
-                    <SelectItem key={severity} value={severity}>
-                      {SEVERITY_LABELS[severity]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {SEVERITIES.map((severity) => (
+                  <option key={severity} value={severity}>
+                    {SEVERITY_LABELS[severity]}
+                  </option>
+                ))}
+              </NativeSelect>
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="incident-reporter">Reported by</Label>
@@ -238,14 +203,16 @@ export function LogIncidentButton({
               placeholder="Facts only: location, people, immediate controls"
             />
           </div>
-          <DialogFooter>
-            <Button type="submit" disabled={!canSubmit && !error}>
-              Save report
-            </Button>
-          </DialogFooter>
+          <div className="-mx-4 -mb-4 flex justify-end border-t bg-muted/50 p-4">
+          <button
+            type="submit"
+            className={buttonVariants()}
+          >
+            Save report
+          </button>
+          </div>
         </form>
-      </DialogContent>
-      </Dialog>
+      </AppModal>
     </>
   );
 }

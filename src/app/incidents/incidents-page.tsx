@@ -2,15 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { NativeSelect } from "@/components/native-select";
 import {
   Table,
   TableBody,
@@ -85,78 +79,60 @@ export function IncidentsPage() {
           placeholder="Search title, ID, or reporter"
           aria-label="Search incidents"
         />
-        <Select
+        <NativeSelect
+          aria-label="Filter by site"
           value={site}
-          onValueChange={(value) => {
-            if (value) setSite(value as Site | "all");
-          }}
+          onChange={(event) => setSite(event.target.value as Site | "all")}
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Site" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All sites</SelectItem>
-            {SITES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {item}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          <option value="all">All sites</option>
+          {SITES.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          aria-label="Filter by category"
           value={category}
-          onValueChange={(value) => {
-            if (value) setCategory(value as IncidentCategory | "all");
-          }}
+          onChange={(event) =>
+            setCategory(event.target.value as IncidentCategory | "all")
+          }
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
-            {INCIDENT_CATEGORIES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {CATEGORY_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          <option value="all">All categories</option>
+          {INCIDENT_CATEGORIES.map((item) => (
+            <option key={item} value={item}>
+              {CATEGORY_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          aria-label="Filter by severity"
           value={severity}
-          onValueChange={(value) => {
-            if (value) setSeverity(value as Severity | "all");
-          }}
+          onChange={(event) =>
+            setSeverity(event.target.value as Severity | "all")
+          }
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Severity" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All severities</SelectItem>
-            {SEVERITIES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {SEVERITY_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
+          <option value="all">All severities</option>
+          {SEVERITIES.map((item) => (
+            <option key={item} value={item}>
+              {SEVERITY_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          aria-label="Filter by status"
           value={status}
-          onValueChange={(value) => {
-            if (value) setStatus(value as IncidentStatus | "all");
-          }}
+          onChange={(event) =>
+            setStatus(event.target.value as IncidentStatus | "all")
+          }
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            {INCIDENT_STATUSES.map((item) => (
-              <SelectItem key={item} value={item}>
-                {INCIDENT_STATUS_LABELS[item]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <option value="all">All statuses</option>
+          {INCIDENT_STATUSES.map((item) => (
+            <option key={item} value={item}>
+              {INCIDENT_STATUS_LABELS[item]}
+            </option>
+          ))}
+        </NativeSelect>
       </div>
 
       {rows.length === 0 ? (
@@ -196,9 +172,9 @@ export function IncidentsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {incident.status !== "closed" ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <button
+                        type="button"
+                        className={buttonVariants({ variant: "outline", size: "sm" })}
                         onClick={() => {
                           const next =
                             incident.status === "open"
@@ -215,7 +191,7 @@ export function IncidentsPage() {
                         {incident.status === "open"
                           ? "Start investigation"
                           : "Close"}
-                      </Button>
+                      </button>
                     ) : (
                       <span className="text-xs text-muted-foreground">Done</span>
                     )}
