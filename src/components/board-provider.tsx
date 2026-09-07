@@ -10,11 +10,12 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { isIsoDate, POLL_MS, todayInZone } from "@/lib/time";
+import { CLOCK_MS, isIsoDate, POLL_MS, todayInZone } from "@/lib/time";
 import type { BoardPayload, CreateBookingInput } from "@/lib/types";
 
 type BoardContextValue = {
   board: BoardPayload | null;
+  now: Date;
   viewDate: string;
   setViewDate: (date: string) => void;
   error: string | null;
@@ -34,6 +35,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   const viewDate = isIsoDate(requested) ? requested : todayInZone();
 
   const [board, setBoard] = useState<BoardPayload | null>(null);
+  const [now, setNow] = useState(() => new Date());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -76,13 +78,47 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   }, [viewDate]);
 
   useEffect(() => {
+    function tick() {
+      setNow(new Date());
+    }
+    tick();
+    const pulse = window.setInterval(tick, CLOCK_MS);
+    let minutePulse = 0;
+    const alignToMinute = window.setTimeout(() => {
+      tick();
+      minutePulse = window.setInterval(tick, 60_000);
+    }, 60_000 - (Date.now() % 60_000) + 250);
+    const onVisible = () => {
+      if (!document.hidden) tick();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", tick);
+    return () => {
+      window.clearInterval(pulse);
+      window.clearTimeout(alignToMinute);
+      window.clearInterval(minutePulse);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", tick);
+    };
+  }, []);
+
+  useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- load and poll the shared board feed */
     void refresh();
     const timer = window.setInterval(() => {
       void refresh();
     }, POLL_MS);
+    const onVisible = () => {
+      if (!document.hidden) void refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
     /* eslint-enable react-hooks/set-state-in-effect */
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
   }, [refresh]);
 
   const book = useCallback(
@@ -109,6 +145,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       board,
+      now,
       viewDate,
       setViewDate,
       error,
@@ -117,7 +154,7 @@ export function BoardProvider({ children }: { children: ReactNode }) {
       book,
       resetDemo,
     }),
-    [board, viewDate, setViewDate, error, loading, refresh, book, resetDemo],
+    [board, now, viewDate, setViewDate, error, loading, refresh, book, resetDemo],
   );
 
   return (

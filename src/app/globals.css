@@ -118,3 +118,31 @@
     transparent
   );
 }
+
+.floor-room-busy {
+  animation: floor-occupancy 2.4s ease-in-out infinite;
+}
+
+.floor-legend-pulse {
+  animation: floor-legend-occupancy 2.4s ease-in-out infinite;
+}
+
+@keyframes floor-occupancy {
+  0%,
+  100% {
+    fill-opacity: 0.34;
+  }
+  50% {
+    fill-opacity: 0.58;
+  }
+}
+
+@keyframes floor-legend-occupancy {
+  0%,
+  100% {
+    opacity: 0.34;
+  }
+  50% {
+    opacity: 0.58;
+  }
+}

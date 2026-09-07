@@ -40,12 +40,14 @@ export type BoardPayload = {
   date: string;
   timezone: string;
   source: "mock" | "graph";
+  kioskFloorId: string;
   rooms: Room[];
   bookings: Booking[];
   hub: HubStory[];
   sharepoint: SharePointItem[];
   dayStartHour: number;
   dayEndHour: number;
+  inUseRoomIds: string[];
 };
 
 export type CreateBookingInput = {

@@ -1,16 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { toast } from "sonner";
-import { COMPANY_NAME } from "@/lib/brand";
+import { COMPANY_NAME, COMPANY_NAME_ZH } from "@/lib/brand";
 import { useBoard } from "@/components/board-provider";
+import { TIMEZONE } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/", label: "Rooms" },
+  { href: "/", label: "Meeting rooms" },
   { href: "/hub", label: "HSH Hub" },
   { href: "/sharepoint", label: "SharePoint" },
 ];
@@ -55,40 +57,45 @@ function NavLinks({
 
 function Wordmark() {
   return (
-    <Link href="/" className="min-w-0 px-2 text-center">
-      <span
-        className="block text-[10px] leading-snug tracking-[0.12em] text-[#004b49] uppercase sm:text-[11px] sm:tracking-[0.16em] md:text-[12px] md:tracking-[0.2em]"
-        style={{ fontFamily: "var(--font-cinzel), serif" }}
-      >
-        {COMPANY_NAME}
+    <Link href="/" className="flex min-w-0 items-center gap-1.5 px-1 text-[12px] leading-snug">
+      <Image
+        src="/hsh-logo.png"
+        alt=""
+        width={80}
+        height={78}
+        className="size-[25px] shrink-0 object-contain"
+        style={{ height: 25, width: 25 }}
+        priority
+      />
+      <span className="min-w-0 text-left text-[12px] leading-snug">
+        <span
+          className="block text-[10px] leading-snug tracking-[0.12em] text-[#004b49] uppercase sm:text-[11px] sm:tracking-[0.16em] md:text-[12px] md:tracking-[0.2em]"
+          style={{ fontFamily: "var(--font-cinzel), serif" }}
+        >
+          {COMPANY_NAME}
+        </span>
+        <span className="block text-[11px] leading-snug tracking-[0.12em] text-[#004b49]">
+          {COMPANY_NAME_ZH}
+        </span>
       </span>
     </Link>
   );
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { board, resetDemo } = useBoard();
+  const { board, now, resetDemo } = useBoard();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [clock, setClock] = useState("");
-
-  useEffect(() => {
-    function tick() {
-      setClock(
-        new Intl.DateTimeFormat("en-GB", {
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).format(new Date()),
-      );
-    }
-    tick();
-    const timer = window.setInterval(tick, 15_000);
-    return () => window.clearInterval(timer);
-  }, []);
+  const clock = new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: board?.timezone ?? TIMEZONE,
+  }).format(now);
 
   return (
-    <div className="flex min-h-full flex-col bg-[#f7f3eb]">
-      <header className="sticky top-0 z-40 border-b border-[#d9cdb8] bg-white">
+    <div className="flex h-full flex-col bg-[#f7f3eb]">
+      <header className="sticky top-0 z-40 shrink-0 border-b border-[#d9cdb8] bg-white">
         <div className="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 md:px-8">
           <div className="flex items-center gap-4">
             <button
@@ -149,15 +156,30 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       ) : null}
-      <main className="flex-1">{children}</main>
-      <footer className="bg-[#5c5c5c] text-[#f3f3f3]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8">
-          <p
-            className="text-[12px] tracking-[0.08em]"
-            style={{ fontFamily: "var(--font-cinzel), serif" }}
-          >
-            {COMPANY_NAME}
-          </p>
+      <main className="flex h-0 min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
+      <footer className="shrink-0 bg-[#5c5c5c] text-[#f3f3f3]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-8">
+          <div className="flex items-center gap-1.5 text-[12px] leading-snug">
+            <Image
+              src="/hsh-logo.png"
+              alt=""
+              width={80}
+              height={78}
+              className="size-[25px] shrink-0 object-contain"
+              style={{ height: 25, width: 25 }}
+            />
+            <div>
+              <p
+                className="text-[12px] leading-snug tracking-[0.08em]"
+                style={{ fontFamily: "var(--font-cinzel), serif" }}
+              >
+                {COMPANY_NAME}
+              </p>
+              <p className="text-[11px] leading-snug tracking-[0.08em] text-white/80">
+                {COMPANY_NAME_ZH}
+              </p>
+            </div>
+          </div>
           <p className="text-[11px] tracking-[0.08em] text-white/75">
             One URL for every kiosk · Outlook remains the source of truth
           </p>

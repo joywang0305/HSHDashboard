@@ -1,18 +1,23 @@
-import { seedBookings, seedHub, seedRooms, seedSharePoint } from "@/lib/seed";
+import { seedBookings, seedHub, seedInUseRoomIds, seedRooms, seedSharePoint } from "@/lib/seed";
+import { resolveKioskFloor } from "@/lib/floor-plan";
+import {
+  cachedSgbRooms,
+  clearGraphCache,
+  fetchSgbOutlookBookings,
+  fetchSgbOutlookRooms,
+  graphCredentialsPresent,
+} from "@/lib/graph";
 import { dateOfInstant, isIsoDate, rangesOverlap, todayInZone } from "@/lib/time";
 import type {
   BoardPayload,
   Booking,
   CreateBookingInput,
+  Room,
 } from "@/lib/types";
 import { DAY_END_HOUR, DAY_START_HOUR, TIMEZONE } from "@/lib/time";
 
 export function isGraphConfigured() {
-  return Boolean(
-    process.env.MICROSOFT_GRAPH_CLIENT_ID &&
-      process.env.MICROSOFT_GRAPH_CLIENT_SECRET &&
-      process.env.MICROSOFT_GRAPH_TENANT_ID,
-  );
+  return graphCredentialsPresent();
 }
 
 type BoardState = {
@@ -45,28 +50,73 @@ function state() {
   return globalState.__hshBoard;
 }
 
-export function getBoard(viewDate?: string | null): BoardPayload {
+function uniqueBookings(items: Booking[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
+export async function getBoard(viewDate?: string | null): Promise<BoardPayload> {
   const current = state();
   const date = isIsoDate(viewDate) ? viewDate : current.date;
-  const bookings = current.bookings.filter(
-    (item) => dateOfInstant(item.start) === date,
+  const potRooms = current.rooms.filter((room) => room.floor !== "SGB");
+  const potBookings = current.bookings.filter(
+    (item) =>
+      dateOfInstant(item.start) === date &&
+      potRooms.some((room) => room.id === item.roomId),
   );
+
+  let sgbRooms: Room[] = current.rooms.filter((room) => room.floor === "SGB");
+  let sgbBookings = current.bookings.filter(
+    (item) =>
+      dateOfInstant(item.start) === date &&
+      sgbRooms.some((room) => room.id === item.roomId),
+  );
+  let source: BoardPayload["source"] = "mock";
+
+  if (isGraphConfigured()) {
+    try {
+      const liveRooms = await fetchSgbOutlookRooms();
+      if (liveRooms.length > 0) {
+        sgbRooms = liveRooms;
+        sgbBookings = await fetchSgbOutlookBookings(liveRooms, date);
+        source = "graph";
+        current.rooms = [...potRooms, ...liveRooms];
+      }
+    } catch (error) {
+      console.error("Outlook SGB rooms failed", error);
+    }
+  }
+
+  const kioskBookings = current.bookings.filter(
+    (item) => item.source === "kiosk" && dateOfInstant(item.start) === date,
+  );
+
   return {
     date,
     timezone: TIMEZONE,
-    source: isGraphConfigured() ? "graph" : "mock",
-    rooms: current.rooms,
-    bookings,
+    source,
+    rooms: [...potRooms, ...sgbRooms],
+    bookings: uniqueBookings([...potBookings, ...sgbBookings, ...kioskBookings]),
     hub: current.hub,
     sharepoint: current.sharepoint,
+    kioskFloorId: resolveKioskFloor(process.env.HSH_KIOSK_FLOOR),
     dayStartHour: DAY_START_HOUR,
     dayEndHour: DAY_END_HOUR,
+    inUseRoomIds: seedInUseRoomIds().filter((id) =>
+      source === "graph" ? !id.startsWith("sgb") : true,
+    ),
   };
 }
 
 export function createBooking(input: CreateBookingInput): Booking {
   const current = state();
-  const room = current.rooms.find((item) => item.id === input.roomId);
+  const room =
+    current.rooms.find((item) => item.id === input.roomId) ??
+    cachedSgbRooms().find((item) => item.id === input.roomId);
   if (!room) {
     throw new Error("That room is not on the Outlook room list.");
   }
@@ -94,15 +144,14 @@ export function createBooking(input: CreateBookingInput): Booking {
     source: "kiosk",
   };
 
-  // When Graph credentials exist this is where we POST
-  // /users/{room.email}/events and then refresh calendarView.
   current.bookings = [...current.bookings, booking].sort((a, b) =>
     a.start.localeCompare(b.start),
   );
   return booking;
 }
 
-export function resetBoard() {
+export async function resetBoard() {
+  clearGraphCache();
   globalState.__hshBoard = createState();
   return getBoard();
 }

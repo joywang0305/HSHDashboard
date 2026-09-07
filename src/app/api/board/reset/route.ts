@@ -3,6 +3,6 @@ import { resetBoard } from "@/lib/board-store";
 
 export const dynamic = "force-dynamic";
 
-export function POST() {
-  return NextResponse.json(resetBoard());
+export async function POST() {
+  return NextResponse.json(await resetBoard());
 }

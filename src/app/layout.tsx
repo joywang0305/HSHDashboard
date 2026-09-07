@@ -29,16 +29,16 @@ export const metadata: Metadata = {
   title: COMPANY_NAME,
   description:
     `Shared kiosk board for ${COMPANY_NAME} meeting rooms, Hub stories, and SharePoint — Outlook holds the calendars.`,
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.svg", apple: "/hsh-crest.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="en-HK"
       className={`${outfit.variable} ${cormorant.variable} ${cinzel.variable} h-full`}
     >
-      <body className="min-h-full font-sans">
+      <body className="h-full overflow-hidden font-sans">
         <Suspense>
           <Providers>
             <AppShell>{children}</AppShell>

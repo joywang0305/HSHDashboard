@@ -2,8 +2,11 @@ export const DAY_START_HOUR = 7;
 export const DAY_END_HOUR = 19;
 export const SLOT_MINUTES = 30;
 export const POLL_MS = 12_000;
+export const CLOCK_MS = 15_000;
 export const TIMEZONE =
-  process.env.HSH_TIMEZONE ?? "Pacific/Auckland";
+  process.env.NEXT_PUBLIC_HSH_TIMEZONE ??
+  process.env.HSH_TIMEZONE ??
+  "Asia/Hong_Kong";
 
 export function todayInZone(timeZone = TIMEZONE, from = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -39,16 +42,32 @@ export function zonedDateTime(date: string, hour: number, minute = 0) {
   return utc;
 }
 
-export function minutesFromMidnight(iso: string) {
-  const date = new Date(iso);
-  return date.getHours() * 60 + date.getMinutes();
-}
-
-export function formatClock(iso: string) {
-  return new Intl.DateTimeFormat("en-GB", {
+export function minutesFromMidnight(iso: string, timeZone = TIMEZONE) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone,
     hour: "2-digit",
     minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(iso));
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? "0");
+  const minute = Number(
+    parts.find((part) => part.type === "minute")?.value ?? "0",
+  );
+  return hour * 60 + minute;
+}
+
+export function formatClock(iso: string, timeZone = TIMEZONE) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   }).format(new Date(iso));
+}
+
+export function formatNumericDate(date: string) {
+  const [year, month, day] = date.split("-");
+  return `${day}/${month}/${year}`;
 }
 
 export function formatDayLabel(date: string) {
