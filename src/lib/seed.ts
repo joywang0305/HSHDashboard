@@ -1,5 +1,5 @@
 import type { Booking, HubStory, Room, SharePointItem } from "@/lib/types";
-import { todayInZone, zonedDateTime } from "@/lib/time";
+import { shiftDate, todayInZone, zonedDateTime } from "@/lib/time";
 
 function at(date: string, time: string) {
   const [hour, minute] = time.split(":").map(Number);
@@ -9,161 +9,682 @@ function at(date: string, time: string) {
 export function seedRooms(): Room[] {
   return [
     {
-      id: "boardroom-a",
-      name: "Boardroom A",
-      email: "boardroom.a@hsh.example",
+      id: "pot4-meeting-west",
+      name: "West Meeting",
+      email: "pot4.west.meeting@hsh.example",
+      capacity: 5,
+      floor: "POT4F",
+      equipment: ["TV", "HDMI"],
+    },
+    {
+      id: "pot4-meeting-east",
+      name: "East Meeting",
+      email: "pot4.east.meeting@hsh.example",
+      capacity: 6,
+      floor: "POT4F",
+      equipment: ["TV"],
+    },
+    {
+      id: "pot4-meeting-north",
+      name: "North Meeting",
+      email: "pot4.north.meeting@hsh.example",
       capacity: 12,
-      floor: "POT12F",
+      floor: "POT4F",
       equipment: ["Teams Room", "Whiteboard"],
     },
     {
+      id: "pot4-meeting-a",
+      name: "Meeting A",
+      email: "pot4.meeting.a@hsh.example",
+      capacity: 4,
+      floor: "POT4F",
+      equipment: ["TV"],
+    },
+    {
+      id: "pot4-meeting-b",
+      name: "Meeting B",
+      email: "pot4.meeting.b@hsh.example",
+      capacity: 4,
+      floor: "POT4F",
+      equipment: ["TV"],
+    },
+    {
+      id: "pot4-phone-booth",
+      name: "Phone Booth",
+      email: "pot4.phone.booth@hsh.example",
+      capacity: 1,
+      floor: "POT4F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot5-meeting",
+      name: "Meeting",
+      email: "pot5.meeting@hsh.example",
+      capacity: 5,
+      floor: "POT5F",
+      equipment: ["TV", "HDMI"],
+    },
+    {
+      id: "pot12-huddle",
+      name: "Huddle",
+      email: "huddle.12@hsh.example",
+      capacity: 4,
+      floor: "POT12F",
+      equipment: ["TV"],
+    },
+    {
+      id: "pot12-phone-n",
+      name: "North Phone",
+      email: "pot12.north.phone@hsh.example",
+      capacity: 1,
+      floor: "POT12F",
+      equipment: ["Phone"],
+    },
+    {
       id: "pot12-interview",
-      name: "Interview 12",
+      name: "Interview",
       email: "interview.12@hsh.example",
       capacity: 4,
       floor: "POT12F",
       equipment: ["Phone"],
     },
     {
-      id: "quiet-room",
-      name: "Quiet Room",
-      email: "quiet.room@hsh.example",
-      capacity: 4,
+      id: "pot12-focus-n",
+      name: "Focus A",
+      email: "pot12.focus.a@hsh.example",
+      capacity: 2,
       floor: "POT12F",
       equipment: ["Phone"],
     },
     {
-      id: "collaboration-2",
-      name: "Collaboration 2",
-      email: "collab.2@hsh.example",
-      capacity: 6,
+      id: "pot12-focus-s",
+      name: "Focus B",
+      email: "pot12.focus.b@hsh.example",
+      capacity: 2,
       floor: "POT12F",
-      equipment: ["TV", "HDMI"],
+      equipment: ["Phone"],
     },
     {
-      id: "pot12-huddle",
-      name: "Huddle 12",
-      email: "huddle.12@hsh.example",
-      capacity: 6,
-      floor: "POT12F",
-      equipment: ["TV"],
-    },
-    {
-      id: "pot12-training",
-      name: "Training 12",
-      email: "training.12@hsh.example",
-      capacity: 16,
-      floor: "POT12F",
-      equipment: ["Projector", "Teams Room"],
-    },
-    {
-      id: "pot14-boardroom",
-      name: "Boardroom 14",
-      email: "boardroom.14@hsh.example",
+      id: "pot12-meeting-10",
+      name: "Meeting 10",
+      email: "pot12.meeting.10@hsh.example",
       capacity: 10,
-      floor: "POT14F",
-      equipment: ["Teams Room", "Whiteboard"],
-    },
-    {
-      id: "pot14-interview",
-      name: "Interview 14",
-      email: "interview.14@hsh.example",
-      capacity: 4,
-      floor: "POT14F",
-      equipment: ["Phone"],
-    },
-    {
-      id: "pot14-focus",
-      name: "Focus 14",
-      email: "focus.14@hsh.example",
-      capacity: 4,
-      floor: "POT14F",
-      equipment: ["Phone"],
-    },
-    {
-      id: "pot14-collab",
-      name: "Collaboration 14",
-      email: "collab.14@hsh.example",
-      capacity: 8,
-      floor: "POT14F",
+      floor: "POT12F",
       equipment: ["TV", "HDMI"],
     },
     {
-      id: "pot14-huddle",
-      name: "Huddle 14",
-      email: "huddle.14@hsh.example",
-      capacity: 6,
-      floor: "POT14F",
-      equipment: ["TV"],
+      id: "pot12-meeting-12",
+      name: "Meeting 12",
+      email: "pot12.meeting.12@hsh.example",
+      capacity: 12,
+      floor: "POT12F",
+      equipment: ["Teams Room", "Whiteboard"],
     },
     {
-      id: "pot14-training",
-      name: "Training 14",
-      email: "training.14@hsh.example",
-      capacity: 14,
-      floor: "POT14F",
+      id: "pot12-meeting-24",
+      name: "Meeting 24",
+      email: "pot12.meeting.24@hsh.example",
+      capacity: 24,
+      floor: "POT12F",
       equipment: ["Projector", "Teams Room"],
     },
     {
-      id: "sgb-boardroom",
-      name: "SGB Boardroom",
-      email: "sgb.boardroom@hsh.example",
-      capacity: 14,
-      floor: "SGB",
-      equipment: ["Teams Room", "Whiteboard"],
-    },
-    {
-      id: "sgb-huddle",
-      name: "SGB Huddle",
-      email: "sgb.huddle@hsh.example",
-      capacity: 6,
-      floor: "SGB",
-      equipment: ["TV"],
-    },
-    {
-      id: "sgb-focus",
-      name: "SGB Focus",
-      email: "sgb.focus@hsh.example",
-      capacity: 4,
-      floor: "SGB",
+      id: "pot12-phone-e",
+      name: "East Phone",
+      email: "pot12.east.phone@hsh.example",
+      capacity: 1,
+      floor: "POT12F",
       equipment: ["Phone"],
     },
     {
-      id: "sgb-collab",
-      name: "SGB Collab",
-      email: "sgb.collab@hsh.example",
+      id: "pot14-meeting-west",
+      name: "West Meeting",
+      email: "pot14.west.meeting@hsh.example",
       capacity: 8,
-      floor: "SGB",
+      floor: "POT14F",
       equipment: ["TV", "HDMI"],
     },
     {
-      id: "sgb-training",
-      name: "SGB Training",
-      email: "sgb.training@hsh.example",
-      capacity: 12,
-      floor: "SGB",
-      equipment: ["Projector"],
+      id: "pot14-meeting-north",
+      name: "North Meeting",
+      email: "pot14.north.meeting@hsh.example",
+      capacity: 8,
+      floor: "POT14F",
+      equipment: ["Teams Room", "Whiteboard"],
     },
     {
-      id: "hub-studio",
-      name: "HSH Hub Studio",
-      email: "hub.studio@hsh.example",
+      id: "pot14-meeting-east",
+      name: "East Meeting",
+      email: "pot14.east.meeting@hsh.example",
+      capacity: 7,
+      floor: "POT14F",
+      equipment: ["Teams Room", "Whiteboard"],
+    },
+    {
+      id: "pot14-phone-west",
+      name: "West Phone",
+      email: "pot14.west.phone@hsh.example",
+      capacity: 2,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot14-phone-east",
+      name: "East Phone",
+      email: "pot14.east.phone@hsh.example",
+      capacity: 2,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot14-phone-booth-n",
+      name: "North Booth",
+      email: "pot14.north.booth@hsh.example",
+      capacity: 1,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot14-phone-booth-e",
+      name: "East Booth",
+      email: "pot14.east.booth@hsh.example",
+      capacity: 1,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot14-phone-south-a",
+      name: "Phone A",
+      email: "pot14.phone.a@hsh.example",
+      capacity: 2,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "pot14-phone-south-b",
+      name: "Phone B",
+      email: "pot14.phone.b@hsh.example",
+      capacity: 2,
+      floor: "POT14F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-boardroom",
+      name: "Boardroom",
+      email: "sgb8.boardroom@hsh.example",
       capacity: 20,
-      floor: "SGB",
-      equipment: ["Projector", "Mic", "Teams Room"],
+      floor: "SGB8F",
+      equipment: ["Teams Room", "Whiteboard"],
+    },
+    {
+      id: "sgb8-meeting-10",
+      name: "Meeting 10",
+      email: "sgb8.meeting.10@hsh.example",
+      capacity: 10,
+      floor: "SGB8F",
+      equipment: ["TV", "HDMI"],
+    },
+    {
+      id: "sgb8-meeting-6",
+      name: "Meeting 6",
+      email: "sgb8.meeting.6@hsh.example",
+      capacity: 6,
+      floor: "SGB8F",
+      equipment: ["TV"],
+    },
+    {
+      id: "sgb8-phonebooth",
+      name: "Phone Booth",
+      email: "sgb8.phonebooth@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-phone-n",
+      name: "Phone N",
+      email: "sgb8.phone.n@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-phone-s",
+      name: "Phone S",
+      email: "sgb8.phone.s@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-phone-e",
+      name: "Phone E",
+      email: "sgb8.phone.e@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-phone-f",
+      name: "Phone F",
+      email: "sgb8.phone.f@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
+    },
+    {
+      id: "sgb8-west-booth",
+      name: "West Booth",
+      email: "sgb8.west.booth@hsh.example",
+      capacity: 1,
+      floor: "SGB8F",
+      equipment: ["Phone"],
     },
   ];
+}
+
+const SEED_HORIZON_DAYS = 5;
+
+const ORGANIZERS = [
+  "Maya Chen",
+  "Elena Voss",
+  "James Liu",
+  "Clara Ng",
+  "Noah Patel",
+  "Priya Nair",
+  "Amira Hassan",
+  "Owen Blake",
+  "Sam Okonkwo",
+] as const;
+
+const TITLES = [
+  "Ops stand-up",
+  "Capital works briefing",
+  "Vendor review",
+  "Brand workshop",
+  "Board papers review",
+  "Hub content planning",
+  "Guest experience huddle",
+  "Fire safety briefing",
+  "Website IA review",
+  "Vendor onboarding",
+  "Leadership forum",
+  "Staff briefing",
+  "All-hands rehearsal",
+  "1:1 coaching",
+  "Recruitment screen",
+  "Payroll query",
+  "Legal consult",
+  "Brand committee",
+  "Budget working session",
+  "Design critique",
+  "Intranet workshop",
+  "Candidate screen",
+  "GM briefing",
+  "Hotel operations review",
+  "Duty manager handoff",
+  "Guest recovery",
+  "Campus interview",
+  "Sprint huddle",
+  "Release dry-run",
+  "Fire warden briefing",
+  "Outlook room training",
+  "Agency briefing",
+  "Manager induction",
+  "Systems walkthrough",
+  "Duty roster",
+  "Event run-of-show",
+  "Project HOME steering",
+  "Fit-out coordination",
+  "Landlord meeting",
+  "Peninsula works review",
+  "Tenant liaison",
+  "Service standard drill",
+  "Night team briefing",
+  "Procurement catch-up",
+  "Close-of-day wrap",
+] as const;
+
+type RoomWindow = { roomId: string; slots: [string, string][] };
+
+const ROOM_WINDOWS: RoomWindow[] = [
+  {
+    roomId: "pot4-meeting-west",
+    slots: [
+      ["09:00", "10:00"],
+      ["14:00", "15:30"],
+    ],
+  },
+  {
+    roomId: "pot4-meeting-east",
+    slots: [
+      ["08:30", "09:30"],
+      ["11:00", "12:00"],
+      ["15:00", "16:00"],
+    ],
+  },
+  {
+    roomId: "pot4-meeting-north",
+    slots: [
+      ["10:00", "12:00"],
+      ["15:00", "16:30"],
+    ],
+  },
+  {
+    roomId: "pot4-meeting-a",
+    slots: [
+      ["09:30", "10:15"],
+      ["13:00", "14:00"],
+    ],
+  },
+  {
+    roomId: "pot4-meeting-b",
+    slots: [
+      ["11:00", "11:45"],
+      ["16:00", "16:45"],
+    ],
+  },
+  {
+    roomId: "pot4-phone-booth",
+    slots: [
+      ["10:00", "10:20"],
+      ["15:30", "15:50"],
+    ],
+  },
+  {
+    roomId: "pot5-meeting",
+    slots: [
+      ["09:00", "10:30"],
+      ["13:30", "15:00"],
+      ["16:00", "17:00"],
+    ],
+  },
+  {
+    roomId: "pot12-huddle",
+    slots: [
+      ["08:30", "09:00"],
+      ["10:00", "10:30"],
+      ["15:00", "16:00"],
+    ],
+  },
+  {
+    roomId: "pot12-phone-n",
+    slots: [
+      ["09:00", "09:20"],
+      ["14:00", "14:20"],
+    ],
+  },
+  {
+    roomId: "pot12-interview",
+    slots: [
+      ["09:30", "10:15"],
+      ["14:00", "14:30"],
+      ["16:00", "16:45"],
+    ],
+  },
+  {
+    roomId: "pot12-focus-n",
+    slots: [
+      ["08:00", "08:30"],
+      ["09:00", "09:45"],
+      ["11:15", "12:00"],
+      ["15:00", "15:30"],
+    ],
+  },
+  {
+    roomId: "pot12-focus-s",
+    slots: [
+      ["08:30", "09:00"],
+      ["11:00", "11:30"],
+      ["16:00", "16:30"],
+    ],
+  },
+  {
+    roomId: "pot12-meeting-10",
+    slots: [
+      ["07:30", "08:15"],
+      ["09:00", "10:00"],
+      ["12:00", "13:00"],
+      ["16:00", "17:00"],
+    ],
+  },
+  {
+    roomId: "pot12-meeting-12",
+    slots: [
+      ["08:30", "09:15"],
+      ["11:00", "12:30"],
+      ["13:00", "14:00"],
+      ["17:00", "17:45"],
+    ],
+  },
+  {
+    roomId: "pot12-meeting-24",
+    slots: [
+      ["08:30", "09:30"],
+      ["13:00", "15:00"],
+    ],
+  },
+  {
+    roomId: "pot12-phone-e",
+    slots: [
+      ["10:30", "10:50"],
+      ["15:30", "15:50"],
+    ],
+  },
+  {
+    roomId: "pot14-meeting-west",
+    slots: [
+      ["08:30", "09:30"],
+      ["11:00", "12:30"],
+      ["15:30", "16:15"],
+    ],
+  },
+  {
+    roomId: "pot14-meeting-north",
+    slots: [
+      ["09:00", "10:30"],
+      ["13:00", "15:00"],
+      ["16:00", "17:00"],
+    ],
+  },
+  {
+    roomId: "pot14-meeting-east",
+    slots: [
+      ["10:00", "12:00"],
+      ["15:30", "17:00"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-west",
+    slots: [
+      ["11:00", "11:45"],
+      ["16:00", "16:30"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-east",
+    slots: [
+      ["10:00", "10:45"],
+      ["14:00", "14:30"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-booth-n",
+    slots: [
+      ["09:00", "09:20"],
+      ["13:00", "13:20"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-booth-e",
+    slots: [
+      ["11:30", "11:50"],
+      ["14:30", "14:50"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-south-a",
+    slots: [
+      ["11:00", "11:30"],
+      ["16:30", "16:50"],
+    ],
+  },
+  {
+    roomId: "pot14-phone-south-b",
+    slots: [
+      ["09:15", "09:35"],
+      ["15:00", "15:20"],
+    ],
+  },
+  {
+    roomId: "sgb8-boardroom",
+    slots: [
+      ["08:00", "09:00"],
+      ["10:00", "11:30"],
+      ["14:00", "16:00"],
+    ],
+  },
+  {
+    roomId: "sgb8-meeting-10",
+    slots: [
+      ["10:30", "11:15"],
+      ["14:00", "15:30"],
+    ],
+  },
+  {
+    roomId: "sgb8-meeting-6",
+    slots: [
+      ["07:30", "08:00"],
+      ["13:00", "13:45"],
+      ["17:00", "17:45"],
+    ],
+  },
+  {
+    roomId: "sgb8-phonebooth",
+    slots: [
+      ["09:00", "09:25"],
+      ["13:00", "13:20"],
+    ],
+  },
+  {
+    roomId: "sgb8-phone-n",
+    slots: [
+      ["09:00", "09:30"],
+      ["15:00", "15:30"],
+    ],
+  },
+  {
+    roomId: "sgb8-phone-s",
+    slots: [
+      ["11:00", "11:20"],
+      ["16:00", "16:20"],
+    ],
+  },
+  {
+    roomId: "sgb8-phone-e",
+    slots: [
+      ["08:30", "10:00"],
+      ["16:00", "17:00"],
+    ],
+  },
+  {
+    roomId: "sgb8-phone-f",
+    slots: [
+      ["08:45", "09:05"],
+      ["14:15", "14:35"],
+    ],
+  },
+  {
+    roomId: "sgb8-west-booth",
+    slots: [
+      ["10:00", "10:20"],
+      ["15:45", "16:05"],
+    ],
+  },
+];
+
+function extraTodayBookings(date: string): Booking[] {
+  const rows: [string, string, string, string, string, string][] = [
+    ["evt-1101", "pot4-meeting-west", "Peninsula works review", "James Liu", "09:00", "10:00"],
+    ["evt-1102", "pot4-meeting-west", "Fit-out coordination", "Elena Voss", "14:00", "15:30"],
+    ["evt-1103", "pot4-meeting-east", "Team catch-up", "Maya Chen", "08:30", "09:30"],
+    ["evt-1104", "pot4-meeting-east", "Procurement", "James Liu", "11:00", "12:00"],
+    ["evt-1105", "pot4-meeting-east", "Vendor close-out", "Elena Voss", "15:00", "16:00"],
+    ["evt-1106", "pot4-meeting-north", "Project HOME steering", "Owen Blake", "10:00", "12:00"],
+    ["evt-1107", "pot4-meeting-north", "Landlord meeting", "Amira Hassan", "15:00", "16:30"],
+    ["evt-1108", "pot4-meeting-a", "Design review", "Priya Nair", "09:30", "10:15"],
+    ["evt-1109", "pot4-meeting-a", "Content walkthrough", "Clara Ng", "13:00", "14:00"],
+    ["evt-1110", "pot4-meeting-b", "Client call prep", "Noah Patel", "11:00", "11:45"],
+    ["evt-1111", "pot4-meeting-b", "Sprint wrap", "Maya Chen", "16:00", "16:45"],
+    ["evt-1112", "pot4-phone-booth", "Quick check", "Clara Ng", "10:00", "10:20"],
+    ["evt-1113", "pot4-phone-booth", "Supplier ping", "James Liu", "15:30", "15:50"],
+    ["evt-1114", "pot5-meeting", "5 PAX workshop", "Priya Nair", "09:00", "10:30"],
+    ["evt-1115", "pot5-meeting", "Tenant liaison", "Elena Voss", "13:30", "15:00"],
+    ["evt-1116", "pot5-meeting", "Workplace huddle", "Maya Chen", "16:00", "17:00"],
+    ["evt-1117", "pot12-phone-n", "Recruiter call", "HR", "09:00", "09:20"],
+    ["evt-1118", "pot12-phone-n", "Counsel note", "Legal", "14:00", "14:20"],
+    ["evt-1119", "pot12-focus-s", "Quiet focus", "Sam Okonkwo", "08:30", "09:00"],
+    ["evt-1120", "pot12-focus-s", "Payroll query", "Finance", "11:00", "11:30"],
+    ["evt-1121", "pot12-focus-s", "1:1 follow-up", "Maya Chen", "16:00", "16:30"],
+    ["evt-1122", "pot12-phone-e", "Agency ping", "Clara Ng", "10:30", "10:50"],
+    ["evt-1123", "pot12-phone-e", "Offer discussion", "HR", "15:30", "15:50"],
+    ["evt-1124", "sgb8-phonebooth", "Private call", "Owen Blake", "09:00", "09:25"],
+    ["evt-1125", "sgb8-phonebooth", "Guest recovery note", "Amira Hassan", "13:00", "13:20"],
+    ["evt-1126", "sgb8-phone-s", "Duty check", "Front office", "11:00", "11:20"],
+    ["evt-1127", "sgb8-phone-s", "Night audit ping", "Finance", "16:00", "16:20"],
+    ["evt-1128", "sgb8-phone-f", "Vendor call", "Priya Nair", "08:45", "09:05"],
+    ["evt-1129", "sgb8-phone-f", "Quick check-in", "Maya Chen", "14:15", "14:35"],
+    ["evt-1130", "sgb8-west-booth", "Service drill", "HSH Hub", "10:00", "10:20"],
+    ["evt-1131", "sgb8-west-booth", "Handoff call", "Front office", "15:45", "16:05"],
+  ];
+  return rows.map(([id, roomId, title, organizer, start, end]) => ({
+    id,
+    roomId,
+    title,
+    organizer,
+    start: at(date, start),
+    end: at(date, end),
+    source: "outlook" as const,
+  }));
+}
+
+function horizonBookings(anchor: string): Booking[] {
+  const bookings: Booking[] = [];
+  for (let offset = 1; offset < SEED_HORIZON_DAYS; offset += 1) {
+    const date = shiftDate(anchor, offset);
+    const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
+    const weekend = weekday === 0 || weekday === 6;
+    ROOM_WINDOWS.forEach((room, roomIndex) => {
+      room.slots.forEach(([start, end], slotIndex) => {
+        if (weekend && slotIndex > 0) return;
+        if (!weekend && (slotIndex + offset + roomIndex) % 5 === 0) return;
+        const title = TITLES[(roomIndex * 3 + slotIndex + offset * 7) % TITLES.length];
+        const organizer =
+          ORGANIZERS[(roomIndex + slotIndex + offset * 2) % ORGANIZERS.length];
+        bookings.push({
+          id: `evt-d${offset}-${room.roomId}-${slotIndex}`,
+          roomId: room.roomId,
+          title,
+          organizer,
+          start: at(date, start),
+          end: at(date, end),
+          source: "outlook",
+        });
+      });
+    });
+  }
+  return bookings;
 }
 
 /** Mock presence: rooms with someone inside, whether booked or free. */
 export function seedInUseRoomIds(): string[] {
   return [
-    "boardroom-a",
-    "hub-studio",
+    "pot12-meeting-12",
+    "sgb8-boardroom",
     "pot12-huddle",
-    "pot14-interview",
-    "pot14-huddle",
-    "sgb-focus",
+    "pot14-phone-west",
+    "pot14-phone-booth-n",
+    "sgb8-phone-n",
   ];
 }
 
@@ -171,16 +692,25 @@ export function seedBookings(date = todayInZone()): Booking[] {
   return [
     {
       id: "evt-1001",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Weekly ops stand-up",
       organizer: "Maya Chen",
+      organizerEmail: "maya.chen@hshgroup.com",
       start: at(date, "08:30"),
       end: at(date, "09:15"),
       source: "outlook",
+      location: "Boardroom A · POT12F",
+      showAs: "busy",
+      attendees: [
+        { name: "Maya Chen", email: "maya.chen@hshgroup.com", status: "organizer" },
+        { name: "Elena Voss", email: "elena.voss@hshgroup.com", status: "accepted" },
+        { name: "James Liu", email: "james.liu@hshgroup.com", status: "tentativelyAccepted" },
+      ],
+      notes: "Facilities, occupancy, and Peninsula works for the week.",
     },
     {
       id: "evt-1006",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Capital works briefing",
       organizer: "James Liu",
       start: at(date, "09:30"),
@@ -189,7 +719,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1002",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Vendor review — facilities",
       organizer: "Elena Voss",
       start: at(date, "11:00"),
@@ -198,7 +728,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1007",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Peninsula brand workshop",
       organizer: "Clara Ng",
       start: at(date, "13:00"),
@@ -207,7 +737,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1008",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Board papers review",
       organizer: "Elena Voss",
       start: at(date, "15:00"),
@@ -216,7 +746,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1009",
-      roomId: "boardroom-a",
+      roomId: "pot12-meeting-12",
       title: "Close-of-day wrap",
       organizer: "Maya Chen",
       start: at(date, "17:00"),
@@ -225,7 +755,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1010",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "IT stand-up",
       organizer: "Noah Patel",
       start: at(date, "07:30"),
@@ -234,16 +764,26 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1003",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "HSH Hub content planning",
       organizer: "Priya Nair",
+      organizerEmail: "priya.nair@hshgroup.com",
       start: at(date, "09:00"),
       end: at(date, "10:00"),
       source: "outlook",
+      location: "Collaboration 2",
+      showAs: "busy",
+      isOnlineMeeting: true,
+      teamsUrl: "https://teams.microsoft.com/l/meetup-join/demo",
+      attendees: [
+        { name: "Priya Nair", status: "organizer" },
+        { name: "Clara Ng", status: "accepted" },
+        { name: "Amira Hassan", status: "notResponded" },
+      ],
     },
     {
       id: "evt-1011",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "Guest experience huddle",
       organizer: "Amira Hassan",
       start: at(date, "10:15"),
@@ -252,7 +792,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1012",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "Lunch & learn — fire safety",
       organizer: "Workplace",
       start: at(date, "12:00"),
@@ -261,7 +801,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1013",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "Website IA review",
       organizer: "Priya Nair",
       start: at(date, "14:00"),
@@ -270,7 +810,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1014",
-      roomId: "collaboration-2",
+      roomId: "pot12-meeting-10",
       title: "Vendor onboarding",
       organizer: "James Liu",
       start: at(date, "16:00"),
@@ -279,7 +819,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1015",
-      roomId: "hub-studio",
+      roomId: "sgb8-boardroom",
       title: "Media training",
       organizer: "Clara Ng",
       start: at(date, "08:00"),
@@ -288,7 +828,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1016",
-      roomId: "hub-studio",
+      roomId: "sgb8-boardroom",
       title: "Leadership forum",
       organizer: "Owen Blake",
       start: at(date, "10:00"),
@@ -297,7 +837,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1017",
-      roomId: "hub-studio",
+      roomId: "sgb8-boardroom",
       title: "Staff briefing",
       organizer: "HSH Hub",
       start: at(date, "12:30"),
@@ -306,7 +846,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1004",
-      roomId: "hub-studio",
+      roomId: "sgb8-boardroom",
       title: "All-hands rehearsal",
       organizer: "Owen Blake",
       start: at(date, "14:00"),
@@ -315,7 +855,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1018",
-      roomId: "hub-studio",
+      roomId: "sgb8-boardroom",
       title: "Community event setup",
       organizer: "Amira Hassan",
       start: at(date, "16:30"),
@@ -324,16 +864,18 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1019",
-      roomId: "quiet-room",
-      title: "Confidential call",
+      roomId: "pot12-focus-n",
+      title: "Private meeting",
       organizer: "Noah Patel",
       start: at(date, "08:00"),
       end: at(date, "08:30"),
       source: "outlook",
+      showAs: "busy",
+      isPrivate: true,
     },
     {
       id: "evt-1020",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "Recruitment screen",
       organizer: "HR",
       start: at(date, "09:00"),
@@ -342,7 +884,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1005",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "1:1 coaching",
       organizer: "Sam Okonkwo",
       start: at(date, "10:30"),
@@ -351,7 +893,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1021",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "Payroll query",
       organizer: "Finance",
       start: at(date, "11:15"),
@@ -360,7 +902,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1022",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "EAP session",
       organizer: "Sam Okonkwo",
       start: at(date, "13:30"),
@@ -369,7 +911,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1023",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "Legal consult",
       organizer: "James Liu",
       start: at(date, "15:00"),
@@ -378,7 +920,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1024",
-      roomId: "quiet-room",
+      roomId: "pot12-focus-n",
       title: "Performance check-in",
       organizer: "Maya Chen",
       start: at(date, "16:15"),
@@ -387,7 +929,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1025",
-      roomId: "pot14-boardroom",
+      roomId: "pot14-meeting-north",
       title: "Brand committee",
       organizer: "Clara Ng",
       start: at(date, "09:00"),
@@ -396,7 +938,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1026",
-      roomId: "pot14-boardroom",
+      roomId: "pot14-meeting-north",
       title: "Budget working session",
       organizer: "Elena Voss",
       start: at(date, "13:00"),
@@ -405,7 +947,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1027",
-      roomId: "pot14-boardroom",
+      roomId: "pot14-meeting-north",
       title: "Vendor close-out",
       organizer: "James Liu",
       start: at(date, "16:00"),
@@ -414,7 +956,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1028",
-      roomId: "pot14-collab",
+      roomId: "pot14-meeting-west",
       title: "Design critique",
       organizer: "Priya Nair",
       start: at(date, "08:30"),
@@ -423,7 +965,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1029",
-      roomId: "pot14-collab",
+      roomId: "pot14-meeting-west",
       title: "Intranet workshop",
       organizer: "Noah Patel",
       start: at(date, "11:00"),
@@ -432,7 +974,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1030",
-      roomId: "pot14-collab",
+      roomId: "pot14-meeting-west",
       title: "Stand-up overflow",
       organizer: "Maya Chen",
       start: at(date, "15:30"),
@@ -441,7 +983,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1031",
-      roomId: "pot14-focus",
+      roomId: "pot14-phone-east",
       title: "Candidate screen",
       organizer: "HR",
       start: at(date, "10:00"),
@@ -450,7 +992,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1032",
-      roomId: "pot14-focus",
+      roomId: "pot14-phone-east",
       title: "Counsel call",
       organizer: "Legal",
       start: at(date, "14:00"),
@@ -459,34 +1001,34 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1033",
-      roomId: "sgb-boardroom",
+      roomId: "sgb8-boardroom",
       title: "GM briefing",
       organizer: "Owen Blake",
-      start: at(date, "08:00"),
-      end: at(date, "09:00"),
+      start: at(date, "09:00"),
+      end: at(date, "09:45"),
       source: "outlook",
     },
     {
       id: "evt-1034",
-      roomId: "sgb-boardroom",
+      roomId: "sgb8-boardroom",
       title: "Hotel operations review",
       organizer: "Amira Hassan",
-      start: at(date, "11:00"),
+      start: at(date, "11:30"),
       end: at(date, "12:30"),
       source: "outlook",
     },
     {
       id: "evt-1035",
-      roomId: "sgb-boardroom",
+      roomId: "sgb8-boardroom",
       title: "Evening wrap",
       organizer: "Owen Blake",
-      start: at(date, "16:30"),
-      end: at(date, "17:30"),
+      start: at(date, "18:00"),
+      end: at(date, "18:45"),
       source: "outlook",
     },
     {
       id: "evt-1036",
-      roomId: "sgb-huddle",
+      roomId: "sgb8-meeting-6",
       title: "Duty manager handoff",
       organizer: "Front office",
       start: at(date, "07:30"),
@@ -495,7 +1037,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1037",
-      roomId: "sgb-huddle",
+      roomId: "sgb8-meeting-6",
       title: "Guest recovery",
       organizer: "Amira Hassan",
       start: at(date, "13:00"),
@@ -504,7 +1046,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1038",
-      roomId: "sgb-huddle",
+      roomId: "sgb8-meeting-6",
       title: "Night audit prep",
       organizer: "Finance",
       start: at(date, "17:00"),
@@ -549,7 +1091,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1043",
-      roomId: "pot12-training",
+      roomId: "pot12-meeting-24",
       title: "Fire warden briefing",
       organizer: "Workplace",
       start: at(date, "08:30"),
@@ -558,7 +1100,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1044",
-      roomId: "pot12-training",
+      roomId: "pot12-meeting-24",
       title: "Outlook room training",
       organizer: "IT",
       start: at(date, "13:00"),
@@ -567,7 +1109,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1045",
-      roomId: "pot14-interview",
+      roomId: "pot14-phone-west",
       title: "Agency briefing",
       organizer: "Clara Ng",
       start: at(date, "11:00"),
@@ -576,7 +1118,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1046",
-      roomId: "pot14-interview",
+      roomId: "pot14-phone-west",
       title: "Offer discussion",
       organizer: "HR",
       start: at(date, "16:00"),
@@ -585,25 +1127,25 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1047",
-      roomId: "pot14-huddle",
-      title: "Content desk huddle",
+      roomId: "pot14-phone-booth-n",
+      title: "Vendor call",
       organizer: "Priya Nair",
       start: at(date, "09:00"),
-      end: at(date, "09:30"),
+      end: at(date, "09:20"),
       source: "outlook",
     },
     {
       id: "evt-1048",
-      roomId: "pot14-huddle",
-      title: "Campaign check",
+      roomId: "pot14-phone-booth-e",
+      title: "Quick check",
       organizer: "Clara Ng",
       start: at(date, "14:30"),
-      end: at(date, "15:15"),
+      end: at(date, "14:50"),
       source: "outlook",
     },
     {
       id: "evt-1049",
-      roomId: "pot14-training",
+      roomId: "pot14-meeting-east",
       title: "Manager induction",
       organizer: "Workplace",
       start: at(date, "10:00"),
@@ -612,7 +1154,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1050",
-      roomId: "pot14-training",
+      roomId: "pot14-meeting-east",
       title: "Systems walkthrough",
       organizer: "Noah Patel",
       start: at(date, "15:30"),
@@ -620,8 +1162,26 @@ export function seedBookings(date = todayInZone()): Booking[] {
       source: "outlook",
     },
     {
+      id: "evt-1050b",
+      roomId: "pot14-phone-south-a",
+      title: "Supplier call",
+      organizer: "James Liu",
+      start: at(date, "11:00"),
+      end: at(date, "11:30"),
+      source: "outlook",
+    },
+    {
+      id: "evt-1050c",
+      roomId: "pot14-phone-south-b",
+      title: "Quick check-in",
+      organizer: "Maya Chen",
+      start: at(date, "15:00"),
+      end: at(date, "15:20"),
+      source: "outlook",
+    },
+    {
       id: "evt-1051",
-      roomId: "sgb-focus",
+      roomId: "sgb8-phone-n",
       title: "Private call",
       organizer: "Owen Blake",
       start: at(date, "09:00"),
@@ -630,7 +1190,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1052",
-      roomId: "sgb-focus",
+      roomId: "sgb8-phone-n",
       title: "Counsel note",
       organizer: "Legal",
       start: at(date, "15:00"),
@@ -639,7 +1199,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1053",
-      roomId: "sgb-collab",
+      roomId: "sgb8-meeting-10",
       title: "Duty roster",
       organizer: "Front office",
       start: at(date, "10:30"),
@@ -648,7 +1208,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1054",
-      roomId: "sgb-collab",
+      roomId: "sgb8-meeting-10",
       title: "Event run-of-show",
       organizer: "Amira Hassan",
       start: at(date, "14:00"),
@@ -657,7 +1217,7 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1055",
-      roomId: "sgb-training",
+      roomId: "sgb8-phone-e",
       title: "Service standard drill",
       organizer: "HSH Hub",
       start: at(date, "08:30"),
@@ -666,13 +1226,15 @@ export function seedBookings(date = todayInZone()): Booking[] {
     },
     {
       id: "evt-1056",
-      roomId: "sgb-training",
+      roomId: "sgb8-phone-e",
       title: "Night team briefing",
       organizer: "Owen Blake",
       start: at(date, "16:00"),
       end: at(date, "17:00"),
       source: "outlook",
     },
+    ...extraTodayBookings(date),
+    ...horizonBookings(date),
   ];
 }
 

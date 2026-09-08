@@ -9,6 +9,7 @@ export function AppModal({
   onClose,
   title,
   description,
+  eyebrow = "Reserve",
   children,
   className,
 }: {
@@ -16,6 +17,7 @@ export function AppModal({
   onClose: () => void;
   title: string;
   description?: string;
+  eyebrow?: string;
   children: ReactNode;
   className?: string;
 }) {
@@ -49,7 +51,7 @@ export function AppModal({
       >
         <div className="flex flex-col gap-1 pr-8">
           <p className="text-[10px] tracking-[0.32em] text-[#c5a44e] uppercase">
-            Reserve
+            {eyebrow}
           </p>
           <h2
             id="app-modal-title"

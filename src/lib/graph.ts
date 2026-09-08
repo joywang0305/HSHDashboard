@@ -1,5 +1,5 @@
 import { zonedDateTime } from "@/lib/time";
-import type { Booking, Room } from "@/lib/types";
+import type { Booking, BookingAttendee, Room } from "@/lib/types";
 import { isHshSgbRoomName, sgbBand } from "@/lib/floor-plan";
 
 type TokenPayload = {
@@ -24,7 +24,24 @@ type GraphEvent = {
   organizer?: { emailAddress?: { name?: string; address?: string } };
   start?: { dateTime?: string; timeZone?: string };
   end?: { dateTime?: string; timeZone?: string };
+  location?: { displayName?: string };
+  attendees?: {
+    type?: string;
+    status?: { response?: string };
+    emailAddress?: { name?: string; address?: string };
+  }[];
+  isOnlineMeeting?: boolean;
+  onlineMeeting?: { joinUrl?: string };
+  showAs?: string;
+  bodyPreview?: string;
+  sensitivity?: string;
+  isAllDay?: boolean;
+  isCancelled?: boolean;
 };
+
+const EVENT_SELECT =
+  "id,subject,organizer,start,end,location,attendees,isOnlineMeeting,onlineMeeting,showAs,bodyPreview,sensitivity,isCancelled";
+const EVENT_SELECT_BASIC = "id,subject,organizer,start,end";
 
 let cachedToken:
   | { value: string; expiresAt: number }
@@ -145,7 +162,7 @@ function toRoom(place: GraphRoom): Room | null {
     name,
     email,
     capacity: Number(place.capacity) > 0 ? Number(place.capacity) : 4,
-    floor: "SGB",
+    floor: "SGB8F",
     equipment: [],
   };
 }
@@ -168,7 +185,7 @@ function toRoomFromUser(user: {
     name,
     email,
     capacity: 4,
-    floor: "SGB",
+    floor: "SGB8F",
     equipment: [],
   };
 }
@@ -219,20 +236,27 @@ async function listGraphRooms(): Promise<GraphRoom[]> {
     }));
 }
 
+function keepBookableSgbRooms(rooms: Room[]) {
+  return rooms.filter((room) => isHshSgbRoomName(room.name, room.email));
+}
+
 export async function fetchSgbOutlookRooms(): Promise<Room[]> {
   if (cachedRooms && Date.now() - cachedRooms.at < 5 * 60_000) {
-    return cachedRooms.rooms;
+    const rooms = keepBookableSgbRooms(cachedRooms.rooms);
+    if (rooms.length !== cachedRooms.rooms.length) {
+      cachedRooms = { ...cachedRooms, rooms };
+    }
+    return rooms;
   }
   const places = await listGraphRooms();
-  const rooms = places
-    .map(toRoom)
-    .filter((room): room is Room => Boolean(room))
-    .sort((a, b) => {
-      const band = (name: string) =>
-        sgbBand(name) === "7F" ? 0 : sgbBand(name) === "8F" ? 1 : 2;
-      const delta = band(a.name) - band(b.name);
-      return delta !== 0 ? delta : a.name.localeCompare(b.name);
-    });
+  const rooms = keepBookableSgbRooms(
+    places.map(toRoom).filter((room): room is Room => Boolean(room)),
+  ).sort((a, b) => {
+    const band = (name: string) =>
+      sgbBand(name) === "7F" ? 0 : sgbBand(name) === "8F" ? 1 : 2;
+    const delta = band(a.name) - band(b.name);
+    return delta !== 0 ? delta : a.name.localeCompare(b.name);
+  });
   cachedRooms = { at: Date.now(), rooms };
   return rooms;
 }
@@ -245,6 +269,66 @@ function graphDateToIso(value?: { dateTime?: string }) {
   return zonedDateTime(date, hour, minute || 0).toISOString();
 }
 
+function mapAttendees(
+  event: GraphEvent,
+  roomEmail: string,
+): BookingAttendee[] {
+  return (event.attendees ?? [])
+    .filter((item) => item.type !== "resource")
+    .filter(
+      (item) =>
+        item.emailAddress?.address?.trim().toLowerCase() !== roomEmail,
+    )
+    .map((item) => ({
+      name:
+        item.emailAddress?.name?.trim() ||
+        item.emailAddress?.address ||
+        "Guest",
+      email: item.emailAddress?.address,
+      status: item.status?.response,
+    }));
+}
+
+function toBooking(event: GraphEvent, room: Room): Booking {
+  const isPrivate =
+    event.sensitivity === "private" || event.sensitivity === "confidential";
+  const subject = event.subject?.trim();
+  return {
+    id: event.id ?? `${room.id}-${event.start?.dateTime}`,
+    roomId: room.id,
+    title: subject ? subject : isPrivate ? "Private meeting" : "Busy",
+    organizer:
+      event.organizer?.emailAddress?.name?.trim() ||
+      event.organizer?.emailAddress?.address ||
+      "Outlook",
+    organizerEmail: event.organizer?.emailAddress?.address,
+    start: graphDateToIso(event.start),
+    end: graphDateToIso(event.end),
+    source: "outlook",
+    location: event.location?.displayName?.trim() || undefined,
+    attendees: mapAttendees(event, room.email),
+    teamsUrl: event.onlineMeeting?.joinUrl,
+    showAs: event.showAs,
+    notes: event.bodyPreview?.trim() || undefined,
+    isPrivate,
+    isOnlineMeeting: Boolean(event.isOnlineMeeting || event.onlineMeeting?.joinUrl),
+  };
+}
+
+async function calendarEvents(room: Room, start: string, end: string) {
+  const path = (select: string) =>
+    `/users/${encodeURIComponent(room.email)}/calendarView?startDateTime=${encodeURIComponent(start)}&endDateTime=${encodeURIComponent(end)}&$select=${select}&$top=80`;
+  try {
+    return await graphCollection<GraphEvent>(path(EVENT_SELECT));
+  } catch (error) {
+    console.error(
+      `Outlook calendar details for ${room.email} failed; retrying basic fields`,
+      error,
+    );
+    return graphCollection<GraphEvent>(path(EVENT_SELECT_BASIC));
+  }
+}
+
 export async function fetchSgbOutlookBookings(
   rooms: Room[],
   date: string,
@@ -254,21 +338,10 @@ export async function fetchSgbOutlookBookings(
   const pages = await Promise.all(
     rooms.map(async (room) => {
       try {
-        const events = await graphCollection<GraphEvent>(
-          `/users/${encodeURIComponent(room.email)}/calendarView?startDateTime=${encodeURIComponent(start)}&endDateTime=${encodeURIComponent(end)}&$select=id,subject,organizer,start,end&$top=80`,
-        );
-        return events.map((event) => ({
-          id: event.id ?? `${room.id}-${event.start?.dateTime}`,
-          roomId: room.id,
-          title: event.subject?.trim() ? event.subject.trim() : "Busy",
-          organizer:
-            event.organizer?.emailAddress?.name?.trim() ||
-            event.organizer?.emailAddress?.address ||
-            "Outlook",
-          start: graphDateToIso(event.start),
-          end: graphDateToIso(event.end),
-          source: "outlook" as const,
-        }));
+        const events = await calendarEvents(room, start, end);
+        return events
+          .filter((event) => !event.isCancelled)
+          .map((event) => toBooking(event, room));
       } catch (error) {
         console.error(`Outlook calendar for ${room.email} failed`, error);
         return [];

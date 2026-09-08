@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { BookRoomModal, type SlotDraft } from "@/components/book-room-modal";
+import { BookingDetailModal } from "@/components/booking-detail-modal";
 import { useBoard } from "@/components/board-provider";
 import {
   DAY_END_HOUR,
@@ -37,6 +38,7 @@ export function RoomDayBoard({
 }) {
   const { board, loading, error, now } = useBoard();
   const [draft, setDraft] = useState<SlotDraft | null>(null);
+  const [openBooking, setOpenBooking] = useState<Booking | null>(null);
   const timeZone = board?.timezone;
   const viewingToday = board?.date === todayInZone(timeZone, now);
 
@@ -114,7 +116,7 @@ export function RoomDayBoard({
               {floorLabel}
             </p>
             <p className="text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
-              Tap an empty slot to book
+              Tap a booking for details · empty slot to book
             </p>
           </div>
         ) : null}
@@ -219,6 +221,7 @@ export function RoomDayBoard({
                       viewingToday={viewingToday}
                       viewDate={board.date}
                       timeZone={timeZone}
+                      onOpen={() => setOpenBooking(booking)}
                     />
                   ))}
                 </div>
@@ -247,6 +250,15 @@ export function RoomDayBoard({
         draft={draft}
         onClose={() => setDraft(null)}
       />
+      <BookingDetailModal
+        booking={openBooking}
+        room={
+          openBooking
+            ? visibleRooms.find((room) => room.id === openBooking.roomId)
+            : undefined
+        }
+        onClose={() => setOpenBooking(null)}
+      />
     </div>
   );
 }
@@ -257,12 +269,14 @@ function BookingBlock({
   viewingToday,
   viewDate,
   timeZone,
+  onOpen,
 }: {
   booking: Booking;
   now: Date;
   viewingToday: boolean;
   viewDate: string;
   timeZone?: string;
+  onOpen: () => void;
 }) {
   const dayStart = DAY_START_HOUR * 60;
   const dayEnd = DAY_END_HOUR * 60;
@@ -277,8 +291,9 @@ function BookingBlock({
   return (
     <button
       type="button"
+      aria-label={`${booking.title}, ${formatClock(booking.start, timeZone)} to ${formatClock(booking.end, timeZone)}`}
       className={cn(
-        "absolute right-1 left-1 z-20 overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
+        "absolute right-1 left-1 z-20 cursor-pointer overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
         phase === "current" &&
           "border-[#9b2c2c] bg-[#9b2c2c] text-white",
         phase === "past" &&
@@ -287,7 +302,10 @@ function BookingBlock({
           "border-[#c5a44e] bg-[#004b49] text-white",
       )}
       style={{ top: `${top}%`, height: `${height}%` }}
-      onClick={(event) => event.stopPropagation()}
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpen();
+      }}
     >
       <p className="truncate text-xs font-medium">{booking.title}</p>
       <p

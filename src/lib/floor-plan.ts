@@ -1,12 +1,23 @@
 /**
- * Geometry for the mock office plates. Replace this file (and the drawing in
- * `office-floor-plan.tsx`) when a real site plan is available — keep `roomId`
- * aligned with Outlook room ids.
+ * Floor-plan registry for CAD kiosk plates. Room ids must stay aligned
+ * with Outlook / seed room ids.
  */
+import { POT4F_ROOMS, POT4F_VIEWBOX } from "@/lib/pot4f-geometry";
+import { POT5F_ROOMS, POT5F_VIEWBOX } from "@/lib/pot5f-geometry";
+import { POT12F_ROOMS, POT12F_VIEWBOX } from "@/lib/pot12f-geometry";
+import { POT14F_ROOMS, POT14F_VIEWBOX } from "@/lib/pot14f-geometry";
+import { SGB8F_ROOMS, SGB8F_VIEWBOX } from "@/lib/sgb8f-geometry";
 import type { Room } from "@/lib/types";
 
-export const FLOOR_IDS = ["POT12F", "POT14F", "SGB"] as const;
+export const FLOOR_IDS = ["POT4F", "POT5F", "POT12F", "POT14F", "SGB8F"] as const;
 export type FloorId = (typeof FLOOR_IDS)[number];
+
+export type FloorPlanViewBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
 export type FloorPlanRoomShape = {
   roomId: string;
@@ -16,18 +27,30 @@ export type FloorPlanRoomShape = {
   height: number;
   labelX: number;
   labelY: number;
+  path?: string;
 };
 
 export type OfficeFloor = {
   id: FloorId;
   building: string;
-  layout: "pot12" | "pot14" | "sgb";
+  shortLabel: string;
+  asset: string;
+  viewBox: FloorPlanViewBox;
   rooms: FloorPlanRoomShape[];
 };
 
-export const FLOOR_PLAN_VIEWBOX = { width: 2000, height: 780 } as const;
+export const DEFAULT_KIOSK_FLOOR: FloorId = "POT14F";
 
-export const DEFAULT_KIOSK_FLOOR: FloorId = "POT12F";
+export const FLOOR_GROUPS = [
+  {
+    building: "Peninsula Office Tower",
+    floorIds: ["POT4F", "POT5F", "POT12F", "POT14F"] as const,
+  },
+  {
+    building: "St George's Building",
+    floorIds: ["SGB8F"] as const,
+  },
+] as const;
 
 export function sgbBand(name: string): "7F" | "8F" | "other" {
   if (/HSH\s*7\s*\/?\s*F/i.test(name)) return "7F";
@@ -35,8 +58,18 @@ export function sgbBand(name: string): "7F" | "8F" | "other" {
   return "other";
 }
 
+export function isOutlookEquipmentResource(value: string) {
+  return /video\s*conference\s*equipment|\bequipment\b/i.test(value);
+}
+
 export function isHshSgbRoomName(name: string, floorHint = "") {
-  return /HSH\s*[78]\s*\/?\s*F/i.test(`${name} ${floorHint}`);
+  const haystack = `${name} ${floorHint}`;
+  if (isOutlookEquipmentResource(haystack)) return false;
+  return /HSH\s*[78]\s*\/?\s*F/i.test(haystack);
+}
+
+export function isSgbFloor(value: string | null | undefined) {
+  return value === "SGB" || value === "SGB8F" || value === "SGB7F";
 }
 
 export function isFloorId(value: string | null | undefined): value is FloorId {
@@ -44,126 +77,120 @@ export function isFloorId(value: string | null | undefined): value is FloorId {
 }
 
 export function resolveKioskFloor(value?: string | null): FloorId {
-  if (value === "SGB8F") return "SGB";
+  if (value === "SGB" || value === "SGB8F" || value === "SGB7F") return "SGB8F";
   return isFloorId(value) ? value : DEFAULT_KIOSK_FLOOR;
 }
 
-function plateRoom(
-  roomId: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): FloorPlanRoomShape {
-  return {
-    roomId,
-    x,
-    y,
-    width,
-    height,
-    labelX: x + width / 2,
-    labelY: y + height / 2,
-  };
+type CadRoom = {
+  roomId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  labelX?: number;
+  labelY?: number;
+  path?: string;
+};
+
+function cadShapes(rooms: readonly CadRoom[]): FloorPlanRoomShape[] {
+  return rooms.map((room) => ({
+    roomId: room.roomId,
+    x: room.x,
+    y: room.y,
+    width: room.width,
+    height: room.height,
+    labelX: room.x + room.width / 2,
+    labelY: room.y + room.height / 2,
+    path: room.path,
+  }));
 }
 
 export const OFFICE_FLOORS: OfficeFloor[] = [
   {
+    id: "POT4F",
+    building: "Peninsula Office Tower",
+    shortLabel: "4F",
+    asset: "/floorplans/pot4f.webp",
+    viewBox: POT4F_VIEWBOX,
+    rooms: cadShapes(POT4F_ROOMS),
+  },
+  {
+    id: "POT5F",
+    building: "Peninsula Office Tower",
+    shortLabel: "5F",
+    asset: "/floorplans/pot5f.webp",
+    viewBox: POT5F_VIEWBOX,
+    rooms: cadShapes(POT5F_ROOMS),
+  },
+  {
     id: "POT12F",
     building: "Peninsula Office Tower",
-    layout: "pot12",
-    rooms: [
-      plateRoom("boardroom-a", 56, 56, 280, 220),
-      plateRoom("pot12-interview", 352, 56, 196, 220),
-      plateRoom("quiet-room", 1748, 56, 196, 120),
-      plateRoom("collaboration-2", 1748, 192, 196, 164),
-      plateRoom("pot12-huddle", 56, 444, 240, 280),
-      plateRoom("pot12-training", 312, 444, 280, 280),
-    ],
+    shortLabel: "12F",
+    asset: "/floorplans/pot12f.webp",
+    viewBox: POT12F_VIEWBOX,
+    rooms: cadShapes(POT12F_ROOMS),
   },
   {
     id: "POT14F",
     building: "Peninsula Office Tower",
-    layout: "pot14",
-    rooms: [
-      plateRoom("pot14-boardroom", 1664, 56, 280, 220),
-      plateRoom("pot14-interview", 1452, 56, 196, 220),
-      plateRoom("pot14-focus", 56, 56, 196, 120),
-      plateRoom("pot14-collab", 56, 192, 196, 164),
-      plateRoom("pot14-huddle", 1704, 444, 240, 280),
-      plateRoom("pot14-training", 1408, 444, 280, 280),
-    ],
+    shortLabel: "14F",
+    asset: "/floorplans/pot14f.webp",
+    viewBox: POT14F_VIEWBOX,
+    rooms: cadShapes(POT14F_ROOMS),
   },
   {
-    id: "SGB",
+    id: "SGB8F",
     building: "St George's Building",
-    layout: "sgb",
-    rooms: [
-      plateRoom("sgb-boardroom", 56, 56, 280, 200),
-      plateRoom("sgb-huddle", 352, 56, 196, 200),
-      plateRoom("sgb-focus", 1748, 56, 196, 200),
-      plateRoom("sgb-collab", 56, 444, 240, 280),
-      plateRoom("sgb-training", 312, 444, 280, 280),
-      plateRoom("hub-studio", 1400, 444, 544, 280),
-    ],
+    shortLabel: "8F",
+    asset: "/floorplans/sgb8f.webp",
+    viewBox: SGB8F_VIEWBOX,
+    rooms: cadShapes(SGB8F_ROOMS),
   },
 ];
 
-function tileBand(
-  rooms: Room[],
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): FloorPlanRoomShape[] {
-  if (rooms.length === 0) return [];
-  const cols =
-    rooms.length <= 4
-      ? rooms.length
-      : Math.min(rooms.length, Math.max(4, Math.ceil(rooms.length / 2)));
-  const rows = Math.ceil(rooms.length / cols);
-  const gap = 16;
-  const cellWidth = (width - gap * (cols - 1)) / cols;
-  const cellHeight = (height - gap * (rows - 1)) / rows;
-  return rooms.map((room, index) => {
-    const col = index % cols;
-    const row = Math.floor(index / cols);
-    const left = x + col * (cellWidth + gap);
-    const top = y + row * (cellHeight + gap);
-    return plateRoom(room.id, left, top, cellWidth, cellHeight);
-  });
-}
-
-export function layoutSgbRooms(rooms: Room[]): FloorPlanRoomShape[] {
-  const seven = rooms
-    .filter((room) => sgbBand(room.name) === "7F")
-    .sort((a, b) => a.name.localeCompare(b.name));
-  const eight = rooms
-    .filter((room) => sgbBand(room.name) !== "7F")
-    .sort((a, b) => a.name.localeCompare(b.name));
-  if (seven.length && eight.length) {
-    return [
-      ...tileBand(eight, 56, 56, 1888, 332),
-      ...tileBand(seven, 56, 404, 1888, 320),
-    ];
-  }
-  const only = seven.length ? seven : eight;
-  return [
-    ...tileBand(only.slice(0, Math.ceil(only.length / 2)), 56, 56, 1888, 332),
-    ...tileBand(only.slice(Math.ceil(only.length / 2)), 56, 404, 1888, 320),
-  ];
-}
+const SGB_CAD_MATCHERS: { roomId: string; test: (name: string) => boolean }[] = [
+  { roomId: "sgb8-boardroom", test: (name) => /boardroom/i.test(name) },
+  { roomId: "sgb8-meeting-10", test: (name) => /10\s*pax/i.test(name) },
+  { roomId: "sgb8-meeting-6", test: (name) => /6\s*pax/i.test(name) },
+  {
+    roomId: "sgb8-phonebooth",
+    test: (name) => /phone\s*booth/i.test(name) && !/west/i.test(name),
+  },
+  { roomId: "sgb8-west-booth", test: (name) => /west\s*booth|phone\s*booth/i.test(name) },
+  { roomId: "sgb8-phone-n", test: (name) => /1\s*pax|phone/i.test(name) },
+];
 
 export function sgbRoomsFrom(rooms: Room[]) {
-  return rooms.filter((room) => room.floor === "SGB");
+  return rooms.filter((room) => isSgbFloor(room.floor));
 }
 
 export function shapesForFloor(floor: OfficeFloor, rooms: Room[]) {
-  if (floor.id !== "SGB") return floor.rooms;
-  const live = sgbRoomsFrom(rooms);
-  return live.length ? layoutSgbRooms(live) : floor.rooms;
+  if (floor.id !== "SGB8F") return floor.rooms;
+  const live = sgbRoomsFrom(rooms).filter(
+    (room) =>
+      !room.id.startsWith("sgb8-") && isHshSgbRoomName(room.name, room.email),
+  );
+  if (live.length === 0) return floor.rooms;
+  const used = new Set<string>();
+  return floor.rooms.map((shape) => {
+    const matcher = SGB_CAD_MATCHERS.find((item) => item.roomId === shape.roomId);
+    const match = live.find(
+      (room) => !used.has(room.id) && matcher?.test(`${room.name} ${room.email}`),
+    );
+    if (!match) return shape;
+    used.add(match.id);
+    return { ...shape, roomId: match.id };
+  });
 }
 
 export function roomsOnFloor(floor: OfficeFloor, rooms: Room[]) {
+  if (floor.id === "SGB8F") {
+    const live = sgbRoomsFrom(rooms).filter(
+      (room) =>
+        !room.id.startsWith("sgb8-") && isHshSgbRoomName(room.name, room.email),
+    );
+    if (live.length > 0) return live;
+  }
   const shapes = shapesForFloor(floor, rooms);
   return shapes
     .map((shape) => rooms.find((room) => room.id === shape.roomId))

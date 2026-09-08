@@ -1,5 +1,5 @@
 import { seedBookings, seedHub, seedInUseRoomIds, seedRooms, seedSharePoint } from "@/lib/seed";
-import { resolveKioskFloor } from "@/lib/floor-plan";
+import { isHshSgbRoomName, isSgbFloor, resolveKioskFloor } from "@/lib/floor-plan";
 import {
   cachedSgbRooms,
   clearGraphCache,
@@ -59,17 +59,27 @@ function uniqueBookings(items: Booking[]) {
   });
 }
 
+function uniqueRooms(items: Room[]) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
 export async function getBoard(viewDate?: string | null): Promise<BoardPayload> {
   const current = state();
   const date = isIsoDate(viewDate) ? viewDate : current.date;
-  const potRooms = current.rooms.filter((room) => room.floor !== "SGB");
+  const potRooms = current.rooms.filter((room) => !isSgbFloor(room.floor));
   const potBookings = current.bookings.filter(
     (item) =>
       dateOfInstant(item.start) === date &&
       potRooms.some((room) => room.id === item.roomId),
   );
 
-  let sgbRooms: Room[] = current.rooms.filter((room) => room.floor === "SGB");
+  const cadSgbRooms = seedRooms().filter((room) => room.id.startsWith("sgb8-"));
+  let sgbRooms: Room[] = current.rooms.filter((room) => isSgbFloor(room.floor));
   let sgbBookings = current.bookings.filter(
     (item) =>
       dateOfInstant(item.start) === date &&
@@ -84,7 +94,7 @@ export async function getBoard(viewDate?: string | null): Promise<BoardPayload> 
         sgbRooms = liveRooms;
         sgbBookings = await fetchSgbOutlookBookings(liveRooms, date);
         source = "graph";
-        current.rooms = [...potRooms, ...liveRooms];
+        current.rooms = [...potRooms, ...cadSgbRooms, ...liveRooms];
       }
     } catch (error) {
       console.error("Outlook SGB rooms failed", error);
@@ -95,11 +105,18 @@ export async function getBoard(viewDate?: string | null): Promise<BoardPayload> 
     (item) => item.source === "kiosk" && dateOfInstant(item.start) === date,
   );
 
+  const listedRooms = uniqueRooms([...potRooms, ...cadSgbRooms, ...sgbRooms]).filter(
+    (room) =>
+      room.id.startsWith("sgb8-") ||
+      !isSgbFloor(room.floor) ||
+      isHshSgbRoomName(room.name, room.email),
+  );
+
   return {
     date,
     timezone: TIMEZONE,
     source,
-    rooms: [...potRooms, ...sgbRooms],
+    rooms: listedRooms,
     bookings: uniqueBookings([...potBookings, ...sgbBookings, ...kioskBookings]),
     hub: current.hub,
     sharepoint: current.sharepoint,

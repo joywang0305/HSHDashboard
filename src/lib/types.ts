@@ -7,6 +7,12 @@ export type Room = {
   equipment: string[];
 };
 
+export type BookingAttendee = {
+  name: string;
+  email?: string;
+  status?: string;
+};
+
 export type Booking = {
   id: string;
   roomId: string;
@@ -15,6 +21,14 @@ export type Booking = {
   start: string;
   end: string;
   source: "outlook" | "kiosk";
+  organizerEmail?: string;
+  location?: string;
+  attendees?: BookingAttendee[];
+  teamsUrl?: string;
+  showAs?: string;
+  notes?: string;
+  isPrivate?: boolean;
+  isOnlineMeeting?: boolean;
 };
 
 export type HubStory = {

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/", label: "Meeting rooms" },
+  { href: "/rooms", label: "Room bookings" },
   { href: "/hub", label: "HSH Hub" },
   { href: "/sharepoint", label: "SharePoint" },
 ];
@@ -63,8 +64,8 @@ function Wordmark() {
         alt=""
         width={80}
         height={78}
-        className="size-[25px] shrink-0 object-contain"
-        style={{ height: 25, width: 25 }}
+        className="size-8 shrink-0 object-contain"
+        style={{ height: 32, width: 32 }}
         priority
       />
       <span className="min-w-0 text-left text-[12px] leading-snug">
@@ -165,8 +166,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               alt=""
               width={80}
               height={78}
-              className="size-[25px] shrink-0 object-contain"
-              style={{ height: 25, width: 25 }}
+              className="size-8 shrink-0 object-contain"
+              style={{ height: 32, width: 32 }}
             />
             <div>
               <p
