@@ -189,7 +189,7 @@ function FloorAndPlanPane({
             OFFICE_FLOORS[0]
           }
         />
-        <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+        <div className="relative h-full min-h-0 min-w-0 flex-1 overflow-hidden">
           <OfficeFloorPlan
             embedded
             kioskFloorId={kioskFloorId}
@@ -241,12 +241,18 @@ function FloorElevation({ floor }: { floor: OfficeFloor }) {
   return (
     <aside
       aria-label={`${floor.building} ${floor.shortLabel} elevation`}
-      className="flex w-[28%] max-w-[16rem] min-w-[8.5rem] shrink-0 overflow-hidden border border-[#d9cdb8] bg-[#fffcf7]"
+      className="relative w-[28%] max-w-[16rem] min-w-[8.5rem] shrink-0 overflow-hidden border border-[#d9cdb8] bg-[#fffcf7] [container-type:size]"
     >
       <img
         src={floor.elevation}
         alt={`${floor.building} ${floor.shortLabel}`}
-        className="h-full w-full object-contain"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-contain object-center"
+        style={{
+          maxHeight: "68cqh",
+          maxWidth: "72cqw",
+          height: "68cqh",
+          width: "auto",
+        }}
         decoding="async"
         fetchPriority="high"
       />

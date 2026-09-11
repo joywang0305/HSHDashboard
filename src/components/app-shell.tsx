@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
 import { toast } from "sonner";
 import { COMPANY_NAME, COMPANY_NAME_ZH } from "@/lib/brand";
 import { useBoard } from "@/components/board-provider";
@@ -15,17 +14,31 @@ import { cn } from "@/lib/utils";
 const nav = [
   { href: "/", label: "Dashboard" },
   { href: "/rooms", label: "Meeting rooms" },
+  { href: "/world-clock", label: "World clock" },
 ];
 
+const KIOSK_PAGES = ["/", "/rooms", "/world-clock"] as const;
 const KIOSK_ROTATE_MS = 60_000;
 const KIOSK_IDLE_MS = 5 * 60_000;
 
 function kioskPeer(pathname: string) {
-  return pathname === "/" ? "/rooms" : "/";
+  const index = KIOSK_PAGES.findIndex((href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href),
+  );
+  if (index < 0) return "/";
+  return KIOSK_PAGES[(index + 1) % KIOSK_PAGES.length];
 }
 
 function isKioskPath(pathname: string) {
-  return pathname === "/" || pathname.startsWith("/rooms");
+  return KIOSK_PAGES.some((href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href),
+  );
+}
+
+function leavingLabel(href: string) {
+  if (href === "/rooms") return "Opening meeting rooms";
+  if (href === "/world-clock") return "Opening world clock";
+  return "Opening dashboard";
 }
 
 function NavLinks({
@@ -52,12 +65,9 @@ function NavLinks({
             prefetch
             scroll={false}
             aria-current={active ? "page" : undefined}
-            onClick={(event) => {
+            onClick={() => {
               onNavigate?.();
-              if (active) {
-                event.preventDefault();
-                return;
-              }
+              if (active) return;
               onLeave?.(item.href);
             }}
             className={cn(
@@ -69,7 +79,7 @@ function NavLinks({
           >
             {item.label}
             {active ? (
-              <span className="absolute inset-x-0 -bottom-1.5 h-px bg-[#c5a44e]" />
+              <span className="pointer-events-none absolute inset-x-0 -bottom-1.5 h-px bg-[#c5a44e]" />
             ) : null}
           </Link>
         );
@@ -80,7 +90,7 @@ function NavLinks({
 
 function Wordmark() {
   return (
-    <Link href="/" className="flex min-w-0 max-w-full items-center gap-1.5 px-1 text-[12px] leading-snug">
+    <Link href="/" className="flex min-w-0 max-w-full cursor-pointer items-center gap-1.5 px-1 text-[12px] leading-snug">
       <Image
         src="/hsh-logo.png"
         alt=""
@@ -109,7 +119,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { board, now, resetDemo } = useBoard();
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [leavingTo, setLeavingTo] = useState<string | null>(null);
   const nextSwitchAt = useRef(Date.now() + KIOSK_ROTATE_MS);
 
@@ -148,6 +157,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     router.prefetch("/");
     router.prefetch("/rooms");
+    router.prefetch("/world-clock");
     const preload = () => {
       for (const floor of OFFICE_FLOORS) {
         const cad = new window.Image();
@@ -190,22 +200,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-full flex-col bg-[#f7f3eb]">
       <header className="sticky top-0 z-40 shrink-0 border-b border-[#d9cdb8] bg-white">
-        <div className="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 md:px-8">
-          <div className="relative z-20 flex items-center gap-4">
-            <button
-              type="button"
-              className="p-2 text-[#004b49] md:hidden"
-              onClick={() => setMobileOpen(true)}
-            >
-              <Menu className="size-4" />
-              <span className="sr-only">Open menu</span>
-            </button>
-            <NavLinks
-              className="relative z-20 hidden md:flex"
-              onLeave={setLeavingTo}
-            />
-          </div>
-          <div className="flex min-w-0 justify-center overflow-hidden">
+        <div className="flex min-h-16 items-center gap-3 px-4 py-3 md:gap-6 md:px-8">
+          <NavLinks className="relative z-20 shrink-0" onLeave={setLeavingTo} />
+          <div className="flex min-w-0 flex-1 justify-center overflow-hidden">
             <Wordmark />
           </div>
           <div className="relative z-20 flex items-center justify-end gap-4">
@@ -220,7 +217,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </p>
             <button
               type="button"
-              className="text-[10px] font-medium tracking-[0.22em] text-[#004b49] uppercase hover:text-[#c5a44e]"
+              className="cursor-pointer text-[10px] font-medium tracking-[0.22em] text-[#004b49] uppercase hover:text-[#c5a44e]"
               onClick={() => {
                 void resetDemo().then(() =>
                   toast.success("Demo board restored"),
@@ -232,46 +229,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      {mobileOpen ? (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <button
-            type="button"
-            aria-label="Close menu"
-            className="absolute inset-0 bg-black/35"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-white p-6">
-            <div className="mb-8 flex items-center justify-between">
-              <Wordmark />
-              <button
-                type="button"
-                className="p-2 text-[#004b49]"
-                onClick={() => setMobileOpen(false)}
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-            <NavLinks
-              onNavigate={() => setMobileOpen(false)}
-              onLeave={setLeavingTo}
-              className="flex-col items-start gap-6"
-            />
-          </div>
-        </div>
-      ) : null}
       <main
         className={cn(
           "relative flex h-0 min-h-0 flex-1 flex-col",
-          pathname === "/" ? "overflow-hidden" : "overflow-y-auto",
+          pathname === "/" || pathname.startsWith("/world-clock")
+            ? "overflow-hidden"
+            : "overflow-y-auto",
         )}
       >
         {children}
         {leavingTo ? (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#f7f3eb]">
             <p className="text-xs tracking-[0.28em] text-[#004b49] uppercase">
-              {leavingTo === "/rooms"
-                ? "Opening meeting rooms"
-                : "Opening dashboard"}
+              {leavingLabel(leavingTo)}
             </p>
           </div>
         ) : null}

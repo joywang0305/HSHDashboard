@@ -116,21 +116,25 @@ export function OfficeFloorPlan({
         </div>
       )}
 
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-[#fffcf7] p-2">
-        {OFFICE_FLOORS.map((item) => (
-          <link key={item.asset} rel="preload" as="image" href={item.asset} />
-        ))}
-        <FloorPlateSvg
-          floor={{ ...floor, rooms: shapesForFloor(floor, board.rooms) }}
-          roomsById={roomsById}
-          bookings={board.bookings}
-          inUseRoomIds={board.inUseRoomIds}
-          now={now}
-          viewingToday={viewingToday}
-          selectedRoomId={selectedRoomId}
-          onSelectFloor={onSelectFloor}
-          onSelectRoom={onSelectRoom}
-        />
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-[#fffcf7] p-2">
+        <div className="hidden">
+          {OFFICE_FLOORS.map((item) => (
+            <link key={item.asset} rel="preload" as="image" href={item.asset} />
+          ))}
+        </div>
+        <div className="flex h-full w-full items-center justify-center [container-type:size]">
+          <FloorPlateSvg
+            floor={{ ...floor, rooms: shapesForFloor(floor, board.rooms) }}
+            roomsById={roomsById}
+            bookings={board.bookings}
+            inUseRoomIds={board.inUseRoomIds}
+            now={now}
+            viewingToday={viewingToday}
+            selectedRoomId={selectedRoomId}
+            onSelectFloor={onSelectFloor}
+            onSelectRoom={onSelectRoom}
+          />
+        </div>
       </div>
 
       {embedded ? null : (
@@ -180,9 +184,16 @@ function FloorPlateSvg({
 }) {
   const { x, y, width, height } = floor.viewBox;
   return (
+    <div
+      className="relative max-h-full max-w-full"
+      style={{
+        width: `min(80cqw, calc(${width / height} * 100cqh))`,
+        height: `min(100cqh, calc(${height / width} * 80cqw))`,
+      }}
+    >
     <svg
       viewBox={`${x} ${y} ${width} ${height}`}
-      className="h-full w-full"
+      className="block h-full w-full"
       preserveAspectRatio="xMidYMid meet"
     >
       <defs>
@@ -232,6 +243,7 @@ function FloorPlateSvg({
         );
       })}
     </svg>
+    </div>
   );
 }
 
