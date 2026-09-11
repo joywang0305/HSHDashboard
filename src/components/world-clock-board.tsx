@@ -29,6 +29,8 @@ function AnalogFace({
   home?: boolean;
 }) {
   const night = hour < 6 || hour >= 18;
+  const afternoon = !night && hour >= 12;
+  const meridiem = hour < 12 ? "AM" : "PM";
   const hourAngle = ((hour % 12) + minute / 60 + second / 3600) * 30;
   const minuteAngle = (minute + second / 60) * 6;
   const secondAngle = second * 6;
@@ -47,28 +49,47 @@ function AnalogFace({
         hubOuter: "#061614",
         hubMid: GOLD,
         hubPin: IVORY,
+        meridiem: GOLD,
       }
-    : {
-        bezel: home ? GOLD : "#b7aa94",
-        face: home ? "#f7f3eb" : IVORY,
-        accent: home ? GOLD : PENINSULA,
-        hourTick: home ? GOLD : PENINSULA,
-        minuteTick: TRACK,
-        inner: TRACK,
-        dialStroke: home ? GOLD : PENINSULA,
-        handLit: PENINSULA_LIT,
-        handShade: PENINSULA_SHADE,
-        second: GOLD,
-        hubOuter: PENINSULA_SHADE,
-        hubMid: GOLD,
-        hubPin: "#1c1914",
-      };
+    : afternoon
+      ? {
+          bezel: home ? GOLD : "#c5a44e",
+          face: home ? "#f3e4bf" : "#f1e2bc",
+          accent: PENINSULA,
+          hourTick: PENINSULA,
+          minuteTick: "#d4c29a",
+          inner: "#c5a44e",
+          dialStroke: home ? GOLD : PENINSULA,
+          handLit: PENINSULA_LIT,
+          handShade: PENINSULA_SHADE,
+          second: GOLD,
+          hubOuter: PENINSULA_SHADE,
+          hubMid: GOLD,
+          hubPin: "#1c1914",
+          meridiem: PENINSULA,
+        }
+      : {
+          bezel: home ? GOLD : "#b7aa94",
+          face: home ? "#f7f3eb" : IVORY,
+          accent: home ? GOLD : PENINSULA,
+          hourTick: home ? GOLD : PENINSULA,
+          minuteTick: TRACK,
+          inner: TRACK,
+          dialStroke: home ? GOLD : PENINSULA,
+          handLit: PENINSULA_LIT,
+          handShade: PENINSULA_SHADE,
+          second: GOLD,
+          hubOuter: PENINSULA_SHADE,
+          hubMid: GOLD,
+          hubPin: "#1c1914",
+          meridiem: home ? GOLD : PENINSULA,
+        };
 
   return (
     <svg
       viewBox="0 0 200 200"
       className="block h-full w-full"
-      aria-label={night ? "Night" : "Day"}
+      aria-label={night ? "Night" : afternoon ? "Afternoon" : "Morning"}
     >
       <circle cx="100" cy="100" r="99" fill={theme.bezel} />
       <circle
@@ -116,6 +137,19 @@ function AnalogFace({
         );
       })}
       <circle cx="100" cy="100" r="46" fill="none" stroke={theme.inner} strokeWidth="0.55" />
+      <text
+        x="100"
+        y="78"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={theme.meridiem}
+        fontFamily="var(--font-cinzel), serif"
+        fontSize="11"
+        fontWeight={600}
+        letterSpacing="0.18em"
+      >
+        {meridiem}
+      </text>
       <g transform={`rotate(${hourAngle} 100 100)`}>
         <polygon points="100,52 105.4,100 100,116" fill={theme.handLit} />
         <polygon points="100,52 94.6,100 100,116" fill={theme.handShade} />
@@ -209,7 +243,7 @@ export function WorldClockBoard() {
                 }}
                 suppressHydrationWarning
               >
-                {clock?.digital ?? "--:--:--"}
+                {clock?.digital ?? "--:--:-- --"}
               </p>
               <p
                 className="mt-[1.6cqi] shrink-0 text-center font-medium leading-tight text-[#004b49]"

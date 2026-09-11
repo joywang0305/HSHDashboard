@@ -79,12 +79,14 @@ export function clockInZone(now: Date, timeZone: string): ZoneClock {
   const minute = Number(part(parts, "minute") || "0");
   const second = Number(part(parts, "second") || "0");
   const offset = part(parts, "timeZoneName").replace("GMT", "UTC");
+  const hour12 = hour % 12 || 12;
+  const meridiem = hour < 12 ? "AM" : "PM";
 
   return {
     hour,
     minute,
     second,
-    digital: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}`,
+    digital: `${hour12}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")} ${meridiem}`,
     weekday: part(parts, "weekday"),
     date: `${part(parts, "day")} ${part(parts, "month")}`,
     offset: offset || "UTC",
