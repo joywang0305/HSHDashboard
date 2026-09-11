@@ -18,11 +18,13 @@ function polar(angleDeg: number, radius: number) {
 }
 
 function AnalogFace({
+  id,
   hour,
   minute,
   second,
   home = false,
 }: {
+  id: string;
   hour: number;
   minute: number;
   second: number;
@@ -31,13 +33,15 @@ function AnalogFace({
   const night = hour < 6 || hour >= 18;
   const afternoon = !night && hour >= 12;
   const meridiem = hour < 12 ? "AM" : "PM";
+  const faceFill = `face-${id}`;
   const hourAngle = ((hour % 12) + minute / 60 + second / 3600) * 30;
   const minuteAngle = (minute + second / 60) * 6;
   const secondAngle = second * 6;
   const theme = night
     ? {
         bezel: home ? GOLD : "#1a3331",
-        face: home ? "#0b201e" : "#0d2321",
+        faceCenter: home ? "#163834" : "#18403c",
+        faceRim: home ? "#081614" : "#0a1b19",
         accent: GOLD,
         hourTick: GOLD,
         minuteTick: "#3f5f5b",
@@ -54,7 +58,8 @@ function AnalogFace({
     : afternoon
       ? {
           bezel: home ? GOLD : "#c5a44e",
-          face: home ? "#f3e4bf" : "#f1e2bc",
+          faceCenter: home ? "#f8edd1" : "#f6e8c9",
+          faceRim: home ? "#e6d3a3" : "#e4d09e",
           accent: PENINSULA,
           hourTick: PENINSULA,
           minuteTick: "#d4c29a",
@@ -70,7 +75,8 @@ function AnalogFace({
         }
       : {
           bezel: home ? GOLD : "#b7aa94",
-          face: home ? "#f7f3eb" : IVORY,
+          faceCenter: home ? "#fbf8f2" : "#fffefb",
+          faceRim: home ? "#efe4d0" : "#f0e6d4",
           accent: home ? GOLD : PENINSULA,
           hourTick: home ? GOLD : PENINSULA,
           minuteTick: TRACK,
@@ -91,14 +97,21 @@ function AnalogFace({
       className="block h-full w-full"
       aria-label={night ? "Night" : afternoon ? "Afternoon" : "Morning"}
     >
+      <defs>
+        <radialGradient id={faceFill} cx="42%" cy="36%" r="74%">
+          <stop offset="0%" stopColor={theme.faceCenter} />
+          <stop offset="100%" stopColor={theme.faceRim} />
+        </radialGradient>
+      </defs>
       <circle cx="100" cy="100" r="99" fill={theme.bezel} />
       <circle
         cx="100"
         cy="100"
         r="96.5"
-        fill={theme.face}
+        fill={`url(#${faceFill})`}
         stroke={theme.dialStroke}
         strokeWidth="1.1"
+        suppressHydrationWarning
       />
       <circle cx="100" cy="100" r="92.6" fill="none" stroke={theme.dialStroke} strokeWidth="0.7" />
       <circle cx="100" cy="100" r="83.4" fill="none" stroke={theme.dialStroke} strokeWidth="0.7" />
@@ -228,12 +241,15 @@ export function WorldClockBoard() {
                 </p>
               ) : null}
               <div className="my-[3.2cqi] aspect-square w-1/2 shrink-0">
-                <AnalogFace
-                  hour={clock?.hour ?? 0}
-                  minute={clock?.minute ?? 0}
-                  second={clock?.second ?? 0}
-                  home={city.home}
-                />
+                {clock ? (
+                  <AnalogFace
+                    id={city.id}
+                    hour={clock.hour}
+                    minute={clock.minute}
+                    second={clock.second}
+                    home={city.home}
+                  />
+                ) : null}
               </div>
               <p
                 className="shrink-0 leading-none text-[#004b49] tabular-nums"
