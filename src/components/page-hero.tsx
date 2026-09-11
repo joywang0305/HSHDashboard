@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDayLabel, formatNumericDate } from "@/lib/time";
 
@@ -50,6 +50,11 @@ export function DayIntro({
   compact?: boolean;
 }) {
   const picker = useRef<HTMLInputElement>(null);
+  const [pickerReady, setPickerReady] = useState(false);
+
+  useEffect(() => {
+    setPickerReady(true);
+  }, []);
 
   function openPicker() {
     const input = picker.current;
@@ -124,18 +129,27 @@ export function DayIntro({
             <span>{formatNumericDate(date)}</span>
             <Calendar className="size-4" />
           </div>
-          <input
-            ref={picker}
-            type="date"
-            lang="en-HK"
-            value={date}
-            onChange={(event) => {
-              if (event.target.value) onPick(event.target.value);
-            }}
-            onClick={openPicker}
-            aria-label="Choose a date"
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-          />
+          {pickerReady ? (
+            <input
+              ref={picker}
+              type="date"
+              lang="en-GB"
+              value={date}
+              onChange={(event) => {
+                if (event.target.value) onPick(event.target.value);
+              }}
+              onClick={openPicker}
+              aria-label="Choose a date"
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            />
+          ) : (
+            <button
+              type="button"
+              aria-label="Choose a date"
+              className="absolute inset-0 h-full w-full cursor-pointer"
+              onClick={openPicker}
+            />
+          )}
         </div>
         <button
           type="button"

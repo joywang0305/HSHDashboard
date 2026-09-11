@@ -294,14 +294,20 @@ function BookingBlock({
       aria-label={`${booking.title}, ${formatClock(booking.start, timeZone)} to ${formatClock(booking.end, timeZone)}`}
       className={cn(
         "absolute right-1 left-1 z-20 cursor-pointer overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
-        phase === "current" &&
-          "border-[#9b2c2c] bg-[#9b2c2c] text-white",
-        phase === "past" &&
-          "border-[#c5a44e]/40 bg-[#004b49]/22 text-[#004b49]",
-        phase === "upcoming" &&
-          "border-[#c5a44e] bg-[#004b49] text-white",
+        phase === "current" && "border-[#9b2c2c] text-white",
+        phase === "past" && "border-[#c5a44e]/40 text-[#004b49]",
+        phase === "upcoming" && "border-[#c5a44e] text-white",
       )}
-      style={{ top: `${top}%`, height: `${height}%` }}
+      style={{
+        top: `${top}%`,
+        height: `${height}%`,
+        backgroundImage:
+          phase === "current"
+            ? "linear-gradient(165deg, #b04545 0%, #9b2c2c 55%, #7a2222 100%)"
+            : phase === "past"
+              ? "linear-gradient(165deg, rgba(0,75,73,0.12) 0%, rgba(0,75,73,0.26) 100%)"
+              : "linear-gradient(165deg, #0a5c59 0%, #004b49 58%, #003835 100%)",
+      }}
       onClick={(event) => {
         event.stopPropagation();
         onOpen();

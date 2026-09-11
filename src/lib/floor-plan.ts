@@ -33,8 +33,10 @@ export type FloorPlanRoomShape = {
 export type OfficeFloor = {
   id: FloorId;
   building: string;
+  code: string;
   shortLabel: string;
   asset: string;
+  elevation?: string;
   viewBox: FloorPlanViewBox;
   rooms: FloorPlanRoomShape[];
 };
@@ -47,7 +49,7 @@ export const FLOOR_GROUPS = [
     floorIds: ["POT4F", "POT5F", "POT12F", "POT14F"] as const,
   },
   {
-    building: "St George's Building",
+    building: "St. George's Building",
     floorIds: ["SGB8F"] as const,
   },
 ] as const;
@@ -109,44 +111,58 @@ export const OFFICE_FLOORS: OfficeFloor[] = [
   {
     id: "POT4F",
     building: "Peninsula Office Tower",
+    code: "POT",
     shortLabel: "4F",
     asset: "/floorplans/pot4f.webp",
+    elevation: "/buildings/pot-4f.jpg",
     viewBox: POT4F_VIEWBOX,
     rooms: cadShapes(POT4F_ROOMS),
   },
   {
     id: "POT5F",
     building: "Peninsula Office Tower",
+    code: "POT",
     shortLabel: "5F",
     asset: "/floorplans/pot5f.webp",
+    elevation: "/buildings/pot-5f.jpg",
     viewBox: POT5F_VIEWBOX,
     rooms: cadShapes(POT5F_ROOMS),
   },
   {
     id: "POT12F",
     building: "Peninsula Office Tower",
+    code: "POT",
     shortLabel: "12F",
     asset: "/floorplans/pot12f.webp",
+    elevation: "/buildings/pot-14f.jpg",
     viewBox: POT12F_VIEWBOX,
     rooms: cadShapes(POT12F_ROOMS),
   },
   {
     id: "POT14F",
     building: "Peninsula Office Tower",
+    code: "POT",
     shortLabel: "14F",
     asset: "/floorplans/pot14f.webp",
+    elevation: "/buildings/pot-15f.jpg",
     viewBox: POT14F_VIEWBOX,
     rooms: cadShapes(POT14F_ROOMS),
   },
   {
     id: "SGB8F",
-    building: "St George's Building",
+    building: "St. George's Building",
+    code: "SGB",
     shortLabel: "8F",
     asset: "/floorplans/sgb8f.webp",
+    elevation: "/buildings/sgb-8f.jpg",
     viewBox: SGB8F_VIEWBOX,
     rooms: cadShapes(SGB8F_ROOMS),
   },
 ];
+
+export function floorTitle(floor: Pick<OfficeFloor, "code" | "shortLabel">) {
+  return `${floor.code} ${floor.shortLabel}`;
+}
 
 const SGB_CAD_MATCHERS: { roomId: string; test: (name: string) => boolean }[] = [
   { roomId: "sgb8-boardroom", test: (name) => /boardroom/i.test(name) },
@@ -183,16 +199,13 @@ export function shapesForFloor(floor: OfficeFloor, rooms: Room[]) {
   });
 }
 
+export function isKioskHiddenRoom(room: { id?: string; name?: string }) {
+  return /phone|booth|huddle/i.test(`${room.id ?? ""} ${room.name ?? ""}`);
+}
+
 export function roomsOnFloor(floor: OfficeFloor, rooms: Room[]) {
-  if (floor.id === "SGB8F") {
-    const live = sgbRoomsFrom(rooms).filter(
-      (room) =>
-        !room.id.startsWith("sgb8-") && isHshSgbRoomName(room.name, room.email),
-    );
-    if (live.length > 0) return live;
-  }
-  const shapes = shapesForFloor(floor, rooms);
-  return shapes
+  return shapesForFloor(floor, rooms)
     .map((shape) => rooms.find((room) => room.id === shape.roomId))
-    .filter((room): room is Room => Boolean(room));
+    .filter((room): room is Room => Boolean(room))
+    .filter((room) => !isKioskHiddenRoom(room));
 }

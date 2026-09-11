@@ -5,6 +5,7 @@ import { useBoard } from "@/components/board-provider";
 import {
   FLOOR_GROUPS,
   OFFICE_FLOORS,
+  isKioskHiddenRoom,
   resolveKioskFloor,
   shapesForFloor,
   type FloorId,
@@ -12,9 +13,8 @@ import {
   type OfficeFloor,
 } from "@/lib/floor-plan";
 import {
-  occupancyFillOpacity,
+  occupancyPaint,
   occupancyWord,
-  OCCUPANCY_FILL,
   OCCUPANCY_STROKE,
   roomOccupancy,
 } from "@/lib/room-occupancy";
@@ -24,20 +24,25 @@ import { cn } from "@/lib/utils";
 
 type OfficeFloorPlanProps = {
   kioskFloorId: FloorId;
+  viewingFloorId?: FloorId;
   selectedRoomId: string | null;
   onSelectFloor: (floorId: FloorId) => void;
   onSelectRoom: (roomId: string | null) => void;
+  embedded?: boolean;
 };
 
 export function OfficeFloorPlan({
   kioskFloorId,
+  viewingFloorId,
   selectedRoomId,
   onSelectFloor,
   onSelectRoom,
+  embedded = false,
 }: OfficeFloorPlanProps) {
   const { board, loading, error, now } = useBoard();
   const viewingToday = board?.date === todayInZone(board?.timezone, now);
-  const [viewingFloorId, setViewingFloorId] = useState<FloorId>(kioskFloorId);
+  const [internalFloorId, setInternalFloorId] = useState<FloorId>(kioskFloorId);
+  const activeFloorId = viewingFloorId ?? internalFloorId;
 
   if (loading && !board) {
     return (
@@ -55,53 +60,61 @@ export function OfficeFloorPlan({
 
   const roomsById = new Map(board.rooms.map((room) => [room.id, room]));
   const floor =
-    OFFICE_FLOORS.find((item) => item.id === viewingFloorId) ??
+    OFFICE_FLOORS.find((item) => item.id === activeFloorId) ??
     OFFICE_FLOORS.find((item) => item.id === resolveKioskFloor(kioskFloorId)) ??
     OFFICE_FLOORS[0];
 
   return (
     <section
       aria-label={`${floor.id} floor plan with meeting rooms coloured by occupancy`}
-      className="flex h-full min-h-[22rem] flex-col border border-[#d9cdb8] bg-white"
+      className={cn(
+        "flex h-full min-h-0 flex-col border border-[#d9cdb8] bg-white",
+        !embedded && "min-h-[22rem]",
+      )}
     >
-      <div className="flex shrink-0 items-end justify-between gap-4 border-b border-[#d9cdb8] bg-white px-4 py-2">
-        <div className="flex min-w-0 flex-wrap items-end gap-x-6 gap-y-2">
-          {FLOOR_GROUPS.map((group) => (
-            <div key={group.building} className="flex min-w-0 flex-col gap-1.5">
-              <p className="text-[10px] tracking-[0.18em] text-[#c5a44e] uppercase">
-                {group.building}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {group.floorIds.map((floorId) => {
-                  const item = OFFICE_FLOORS.find((entry) => entry.id === floorId);
-                  if (!item) return null;
-                  const selected = viewingFloorId === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setViewingFloorId(item.id)}
-                      aria-pressed={selected}
-                      className={cn(
-                        "min-w-12 border px-3 py-1.5 text-sm leading-none outline-none",
-                        selected
-                          ? "border-[#c5a44e] bg-[#004b49] text-[#f7f3eb] ring-1 ring-[#c5a44e]"
-                          : "border-[#d9cdb8] bg-[#f7f3eb] text-[#004b49] hover:border-[#c5a44e]",
-                      )}
-                      style={{ fontFamily: "var(--font-cormorant), serif" }}
-                    >
-                      {item.shortLabel}
-                    </button>
-                  );
-                })}
+      {embedded ? null : (
+        <div className="flex shrink-0 items-end justify-between gap-4 border-b border-[#d9cdb8] bg-white px-4 py-2">
+          <div className="flex min-w-0 flex-wrap items-end gap-x-6 gap-y-2">
+            {FLOOR_GROUPS.map((group) => (
+              <div key={group.building} className="flex min-w-0 flex-col gap-1.5">
+                <p className="text-[10px] tracking-[0.18em] text-[#c5a44e] uppercase">
+                  {group.building}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {group.floorIds.map((floorId) => {
+                    const item = OFFICE_FLOORS.find((entry) => entry.id === floorId);
+                    if (!item) return null;
+                    const selected = activeFloorId === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setInternalFloorId(item.id);
+                          onSelectFloor(item.id);
+                        }}
+                        aria-pressed={selected}
+                        className={cn(
+                          "min-w-12 border px-3 py-1.5 text-sm leading-none outline-none",
+                          selected
+                            ? "border-[#c5a44e] bg-[#004b49] text-[#f7f3eb] ring-1 ring-[#c5a44e]"
+                            : "border-[#d9cdb8] bg-[#f7f3eb] text-[#004b49] hover:border-[#c5a44e]",
+                        )}
+                        style={{ fontFamily: "var(--font-cormorant), serif" }}
+                      >
+                        {item.shortLabel}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <p className="shrink-0 pb-1 text-right text-[10px] tracking-[0.12em] text-[#6b6458] uppercase">
+            Tap a room to open the calendar
+          </p>
         </div>
-        <p className="shrink-0 pb-1 text-right text-[10px] tracking-[0.12em] text-[#6b6458] uppercase">
-          Tap a room to open the calendar
-        </p>
-      </div>
+      )}
 
       <div className="flex min-h-0 flex-1 items-center justify-center bg-[#fffcf7] p-2">
         {OFFICE_FLOORS.map((item) => (
@@ -120,24 +133,26 @@ export function OfficeFloorPlan({
         />
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-4 border-t border-[#d9cdb8] bg-white px-4 py-2 text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
-        <span className="inline-flex items-center gap-2">
-          <span className="size-3 bg-[#004b49]/30 ring-1 ring-[#004b49]" />
-          Available
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="floor-legend-pulse size-3 bg-[#004b49] ring-1 ring-[#004b49]" />
-          In use
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="size-3 bg-[#9b2c2c]/50 ring-1 ring-[#9b2c2c]" />
-          Booked
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="floor-legend-pulse size-3 bg-[#9b2c2c] ring-1 ring-[#9b2c2c]" />
-          Occupied
-        </span>
-      </div>
+      {embedded ? null : (
+        <div className="flex shrink-0 flex-wrap items-center gap-4 border-t border-[#d9cdb8] bg-white px-4 py-2 text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
+          <span className="inline-flex items-center gap-2">
+            <span className="size-3 bg-[#004b49]/30 ring-1 ring-[#004b49]" />
+            Available
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="floor-legend-pulse size-3 bg-[#004b49] ring-1 ring-[#004b49]" />
+            In use
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="size-3 bg-[#9b2c2c]/50 ring-1 ring-[#9b2c2c]" />
+            Booked
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="floor-legend-pulse size-3 bg-[#9b2c2c] ring-1 ring-[#9b2c2c]" />
+            Occupied
+          </span>
+        </div>
+      )}
     </section>
   );
 }
@@ -170,6 +185,24 @@ function FloorPlateSvg({
       className="h-full w-full"
       preserveAspectRatio="xMidYMid meet"
     >
+      <defs>
+        <linearGradient id="hsh-occ-free" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#004b49" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#004b49" stopOpacity="0.26" />
+        </linearGradient>
+        <linearGradient id="hsh-occ-inuse" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0a5c59" />
+          <stop offset="100%" stopColor="#003835" />
+        </linearGradient>
+        <linearGradient id="hsh-occ-booked" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#9b2c2c" stopOpacity="0.38" />
+          <stop offset="100%" stopColor="#9b2c2c" stopOpacity="0.56" />
+        </linearGradient>
+        <linearGradient id="hsh-occ-busy" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#b04545" />
+          <stop offset="100%" stopColor="#7a2222" />
+        </linearGradient>
+      </defs>
       <rect x={x} y={y} width={width} height={height} fill="#fffcf7" />
       <image
         href={floor.asset}
@@ -179,21 +212,25 @@ function FloorPlateSvg({
         height={height}
         preserveAspectRatio="none"
       />
-      {floor.rooms.map((shape) => (
-        <FloorRoom
-          key={shape.roomId}
-          shape={shape}
-          room={roomsById.get(shape.roomId)}
-          bookings={bookings}
-          inUseRoomIds={inUseRoomIds}
-          now={now}
-          viewingToday={viewingToday}
-          selectedRoomId={selectedRoomId}
-          onSelectFloor={() => onSelectFloor(floor.id)}
-          onSelectRoom={onSelectRoom}
-          largeLabel
-        />
-      ))}
+      {floor.rooms.map((shape) => {
+        const room = roomsById.get(shape.roomId);
+        if (isKioskHiddenRoom({ id: shape.roomId, name: room?.name })) return null;
+        return (
+          <FloorRoom
+            key={shape.roomId}
+            shape={shape}
+            room={room}
+            bookings={bookings}
+            inUseRoomIds={inUseRoomIds}
+            now={now}
+            viewingToday={viewingToday}
+            selectedRoomId={selectedRoomId}
+            onSelectFloor={() => onSelectFloor(floor.id)}
+            onSelectRoom={onSelectRoom}
+            largeLabel
+          />
+        );
+      })}
     </svg>
   );
 }
@@ -269,7 +306,7 @@ function FloorRoom({
     inUseRoomIds,
   );
   const selected = selectedRoomId === room.id;
-  const fill = OCCUPANCY_FILL[occupancy.kind];
+  const paint = occupancyPaint(occupancy);
   const stroke = selected ? "#c5a44e" : "none";
   const { lines, fontSize } = nameLayout(room.name, shape.width, shape.height);
   const occupancyLabel = occupancyWord(occupancy.kind);
@@ -285,8 +322,7 @@ function FloorRoom({
   const metaY = nameTop + lines.length * nameGap + 2;
 
   const occupancyShape = {
-    fill,
-    fillOpacity: occupancyFillOpacity(occupancy),
+    fill: paint.svgFill,
     stroke,
     strokeWidth: selected ? 2 : 0,
     className: cn(occupancy.occupied && "floor-room-busy"),

@@ -70,13 +70,34 @@ export function formatNumericDate(date: string) {
   return `${day}/${month}/${year}`;
 }
 
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
 export function formatDayLabel(date: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(`${date}T12:00:00`));
+  const [year, month, day] = date.split("-").map(Number);
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  return `${WEEKDAYS[weekday]}, ${day} ${MONTHS[month - 1]} ${year}`;
 }
 
 export function isIsoDate(value: string | null | undefined): value is string {

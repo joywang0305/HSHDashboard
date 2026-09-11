@@ -1,8 +1,12 @@
 import type { Booking, HubStory, Room, SharePointItem } from "@/lib/types";
-import { shiftDate, todayInZone, zonedDateTime } from "@/lib/time";
+import { TIMEZONE, shiftDate, todayInZone, zonedDateTime } from "@/lib/time";
 
 function at(date: string, time: string) {
   const [hour, minute] = time.split(":").map(Number);
+  if (TIMEZONE === "Asia/Hong_Kong") {
+    const [year, month, day] = date.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day, hour - 8, minute)).toISOString();
+  }
   return zonedDateTime(date, hour, minute).toISOString();
 }
 

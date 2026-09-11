@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RoomsSplitView } from "@/components/rooms-split-view";
 import { useBoard } from "@/components/board-provider";
@@ -10,7 +10,17 @@ import {
   type FloorId,
 } from "@/lib/floor-plan";
 
-export default function RoomsPage() {
+function RoomsLoadingFallback() {
+  return (
+    <div className="flex h-full items-center justify-center bg-[#f7f3eb]">
+      <p className="text-xs tracking-[0.28em] text-[#004b49] uppercase">
+        Loading meeting rooms
+      </p>
+    </div>
+  );
+}
+
+function RoomsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { board } = useBoard();
@@ -59,5 +69,13 @@ export default function RoomsPage() {
         writeSelection(floor, roomId);
       }}
     />
+  );
+}
+
+export default function RoomsPage() {
+  return (
+    <Suspense fallback={<RoomsLoadingFallback />}>
+      <RoomsPageInner />
+    </Suspense>
   );
 }
