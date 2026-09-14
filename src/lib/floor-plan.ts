@@ -209,3 +209,10 @@ export function roomsOnFloor(floor: OfficeFloor, rooms: Room[]) {
     .filter((room): room is Room => Boolean(room))
     .filter((room) => !isKioskHiddenRoom(room));
 }
+
+export function kioskRoomsByFloor(rooms: Room[]) {
+  return OFFICE_FLOORS.map((floor) => ({
+    floor,
+    rooms: roomsOnFloor(floor, rooms),
+  })).filter((group) => group.rooms.length > 0);
+}

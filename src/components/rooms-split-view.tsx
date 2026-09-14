@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { AdhocBookDialog } from "@/components/adhoc-book-dialog";
 import { DayIntro } from "@/components/page-hero";
 import { OfficeFloorPlan } from "@/components/office-floor-plan";
 import { RoomDayBoard } from "@/components/room-day-board";
@@ -35,6 +37,7 @@ export function RoomsSplitView({
   onSelectRoom?: (roomId: string | null) => void;
 }) {
   const { board, viewDate, setViewDate, now } = useBoard();
+  const [bookingOpen, setBookingOpen] = useState(false);
   const kioskFloorId = isFloorId(board?.kioskFloorId)
     ? board.kioskFloorId
     : DEFAULT_KIOSK_FLOOR;
@@ -71,6 +74,7 @@ export function RoomsSplitView({
         onPrev={() => setViewDate(shiftDate(viewDate, -1))}
         onNext={() => setViewDate(shiftDate(viewDate, 1))}
         onPick={setViewDate}
+        onBookRoom={() => setBookingOpen(true)}
       />
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-hidden p-2 md:grid-cols-2 md:gap-3 md:p-3">
         <div className="h-full min-h-0">
@@ -96,6 +100,15 @@ export function RoomsSplitView({
           />
         </div>
       </div>
+      <AdhocBookDialog
+        key={bookingOpen ? "open" : "closed"}
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        onBooked={(room) => {
+          if (isFloorId(room.floor)) selectFloor(room.floor);
+          selectRoom(room.id);
+        }}
+      />
     </div>
   );
 }

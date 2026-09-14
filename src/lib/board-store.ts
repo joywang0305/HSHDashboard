@@ -154,7 +154,7 @@ export function createBooking(input: CreateBookingInput): Booking {
   const booking: Booking = {
     id: `kiosk-${Date.now()}`,
     roomId: input.roomId,
-    title: input.title.trim(),
+    title: input.title.trim() || "Ad hoc",
     organizer: input.organizer.trim(),
     start: input.start,
     end: input.end,
