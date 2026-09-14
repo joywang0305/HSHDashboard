@@ -147,7 +147,7 @@ export function createBooking(input: CreateBookingInput): Booking {
   );
   if (clash) {
     throw new Error(
-      `${room.name} is already booked for ${clash.title} at that time.`,
+      `${room.name} is already booked at that time.`,
     );
   }
 

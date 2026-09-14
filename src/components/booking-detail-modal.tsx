@@ -43,7 +43,7 @@ export function BookingDetailModal({
       open={booking !== null}
       onClose={onClose}
       eyebrow="Booking"
-      title={booking?.title ?? "Meeting"}
+      title={booking?.organizer || "Reserved"}
       description={
         booking
           ? `${formatClock(booking.start)}–${formatClock(booking.end)}${
@@ -54,14 +54,13 @@ export function BookingDetailModal({
     >
       {booking ? (
         <div className="grid max-h-[60vh] gap-4 overflow-y-auto">
-          <DetailRow label="Organised by">
-            {booking.organizer}
-            {booking.organizerEmail ? (
-              <span className="mt-0.5 block font-normal tracking-normal text-[#6b6458] normal-case">
+          {booking.organizerEmail ? (
+            <DetailRow label="Organised by">
+              <span className="font-normal tracking-normal text-[#6b6458] normal-case">
                 {booking.organizerEmail}
               </span>
-            ) : null}
-          </DetailRow>
+            </DetailRow>
+          ) : null}
           {showAs ? <DetailRow label="Show as">{showAs}</DetailRow> : null}
           {booking.location ? (
             <DetailRow label="Location">{booking.location}</DetailRow>

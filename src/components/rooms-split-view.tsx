@@ -160,9 +160,15 @@ function FloorAndPlanPane({
 
   return (
     <section
-      aria-label="Meeting rooms and floor plan"
+      aria-label="Room occupancy"
       className="flex h-full min-h-0 flex-col gap-1.5 overflow-hidden"
     >
+      <h2
+        className="shrink-0 border border-[#d9cdb8] bg-white px-3 py-1.5 text-xl font-medium italic leading-tight text-[#004b49] md:text-2xl"
+        style={{ fontFamily: "var(--font-cormorant), serif" }}
+      >
+        Room occupancy
+      </h2>
       <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden">
         <div className="flex h-[90%] min-h-0 flex-col gap-1">
           {DIRECTORY_ROWS.map((row) => (

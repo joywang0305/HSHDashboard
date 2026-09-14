@@ -107,19 +107,18 @@ export function RoomDayBoard({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden border border-[#d9cdb8] bg-white">
-        {floorLabel ? (
-          <div className="flex shrink-0 items-baseline justify-between gap-3 border-b border-[#d9cdb8] px-3 py-1.5">
-            <p
-              className="text-base leading-tight text-[#004b49]"
-              style={{ fontFamily: "var(--font-cormorant), serif" }}
-            >
-              {floorLabel}
-            </p>
-            <p className="text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
-              Tap a booking for details · empty slot to book
-            </p>
-          </div>
-        ) : null}
+        <div className="flex shrink-0 items-baseline justify-between gap-3 border-b border-[#d9cdb8] px-3 py-1.5">
+          <h2
+            className="min-w-0 text-xl font-medium italic leading-tight text-[#004b49] md:text-2xl"
+            style={{ fontFamily: "var(--font-cormorant), serif" }}
+          >
+            Day schedule
+          </h2>
+          <p className="max-w-[55%] text-right text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
+            {floorLabel ? `${floorLabel} · ` : null}
+            Tap a booking for details · empty slot to book
+          </p>
+        </div>
         <div
           className="relative z-20 grid shrink-0 min-w-0 overflow-x-auto bg-white"
           style={{
@@ -291,7 +290,7 @@ function BookingBlock({
   return (
     <button
       type="button"
-      aria-label={`${booking.title}, ${formatClock(booking.start, timeZone)} to ${formatClock(booking.end, timeZone)}`}
+      aria-label={`${booking.organizer}, ${formatClock(booking.start, timeZone)} to ${formatClock(booking.end, timeZone)}`}
       className={cn(
         "absolute right-1 left-1 z-20 cursor-pointer overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
         phase === "current" && "border-[#9b2c2c] text-white",
@@ -313,7 +312,7 @@ function BookingBlock({
         onOpen();
       }}
     >
-      <p className="truncate text-xs font-medium">{booking.title}</p>
+      <p className="truncate text-xs font-medium">{booking.organizer}</p>
       <p
         className={cn(
           "truncate text-[10px]",
@@ -322,9 +321,7 @@ function BookingBlock({
           phase === "upcoming" && "text-[#c5a44e]",
         )}
       >
-        {formatClock(booking.start, timeZone)}–{formatClock(booking.end, timeZone)}{" "}
-        ·{" "}
-        {booking.organizer}
+        {formatClock(booking.start, timeZone)}–{formatClock(booking.end, timeZone)}
       </p>
     </button>
   );
