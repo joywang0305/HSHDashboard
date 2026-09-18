@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { COMPANY_NAME, COMPANY_NAME_ZH } from "@/lib/brand";
 import { useBoard } from "@/components/board-provider";
+import { HkWeather } from "@/components/hk-weather";
+import { HshQuote } from "@/components/hsh-quote";
 import { OFFICE_FLOORS } from "@/lib/floor-plan";
 import { TIMEZONE } from "@/lib/time";
 import { cn } from "@/lib/utils";
@@ -116,7 +117,7 @@ function Wordmark() {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { board, now, resetDemo } = useBoard();
+  const { board, now } = useBoard();
   const pathname = usePathname();
   const router = useRouter();
   const [leavingTo, setLeavingTo] = useState<string | null>(null);
@@ -205,27 +206,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex min-w-0 flex-1 justify-center overflow-hidden">
             <Wordmark />
           </div>
-          <div className="relative z-20 flex items-center justify-end gap-4">
+          <div className="relative z-20 flex shrink-0 items-center justify-end gap-3.5">
             <p
-              className="hidden text-[10px] tracking-[0.18em] text-[#6b6458] uppercase sm:block"
+              className="hidden whitespace-nowrap text-[13px] font-medium tracking-[0.1em] text-[#6b6458] uppercase sm:block"
               suppressHydrationWarning
             >
               {clock}
-              {board
-                ? ` · ${board.source === "graph" ? "Outlook" : "Outlook mock"}`
-                : ""}
             </p>
-            <button
-              type="button"
-              className="cursor-pointer text-[10px] font-medium tracking-[0.22em] text-[#004b49] uppercase hover:text-[#c5a44e]"
-              onClick={() => {
-                void resetDemo().then(() =>
-                  toast.success("Demo board restored"),
-                );
-              }}
-            >
-              Restore demo
-            </button>
+            <span
+              className="hidden h-5 w-px bg-[#c5a44e]/55 sm:block"
+              aria-hidden
+            />
+            <HshQuote />
+            <span className="h-5 w-px bg-[#c5a44e]/55" aria-hidden />
+            <HkWeather />
           </div>
         </div>
       </header>
