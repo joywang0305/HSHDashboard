@@ -135,6 +135,11 @@ function GradientDefs({ id }: { id: string }) {
         <stop offset="55%" stopColor="#004b49" />
         <stop offset="100%" stopColor="#0a5c59" />
       </linearGradient>
+      <linearGradient id={`${id}-across-gold`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="#9a7d38" />
+        <stop offset="55%" stopColor="#c5a44e" />
+        <stop offset="100%" stopColor="#d4b56a" />
+      </linearGradient>
       <radialGradient id={`${id}-radar`} cx="38%" cy="32%" r="72%">
         <stop offset="0%" stopColor="#0a5c59" stopOpacity="0.55" />
         <stop offset="55%" stopColor="#004b49" stopOpacity="0.38" />
@@ -755,9 +760,11 @@ export function RadarChart({
 export function GaugeChart({
   value,
   label,
+  tone = "peninsula",
 }: {
   value: number;
   label: string;
+  tone?: "peninsula" | "gold";
 }) {
   const clamped = Math.min(1, Math.max(0, value));
   const radius = 78;
@@ -766,11 +773,12 @@ export function GaugeChart({
   const circ = Math.PI * radius;
   const dash = clamped * circ;
   const paintId = usePaintId();
+  const stroke = tone === "gold" ? `url(#${paintId}-across-gold)` : `url(#${paintId}-across)`;
 
   return (
     <svg
       viewBox="0 0 220 140"
-      preserveAspectRatio="xMinYMid meet"
+      preserveAspectRatio="xMidYMid meet"
       className="h-full min-h-0 w-full flex-1"
       role="img"
     >
@@ -785,7 +793,7 @@ export function GaugeChart({
       <path
         d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
         fill="none"
-        stroke={`url(#${paintId}-across)`}
+        stroke={stroke}
         strokeWidth="16"
         strokeDasharray={`${dash} ${circ}`}
       />

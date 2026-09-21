@@ -15,8 +15,8 @@ export const WORLD_CITIES: WorldCity[] = [
     timeZone: "Asia/Hong_Kong",
     home: true,
   },
-  { id: "bangkok", name: "Bangkok", places: ["Bangkok"], timeZone: "Asia/Bangkok" },
   { id: "manila", name: "Manila", places: ["Manila"], timeZone: "Asia/Manila" },
+  { id: "bangkok", name: "Bangkok", places: ["Bangkok"], timeZone: "Asia/Bangkok" },
   {
     id: "istanbul",
     name: "Istanbul",
@@ -91,4 +91,83 @@ export function clockInZone(now: Date, timeZone: string): ZoneClock {
     date: `${part(parts, "day")} ${part(parts, "month")}`,
     offset: offset || "UTC",
   };
+}
+
+export function offsetMinutes(offset: string): number {
+  const match = offset.match(/([+-])(\d{1,2})(?::(\d{2}))?/);
+  if (!match) return 0;
+  const sign = match[1] === "-" ? -1 : 1;
+  return sign * (Number(match[2]) * 60 + Number(match[3] ?? 0));
+}
+
+export function formatUtcOffset(minutes: number) {
+  const sign = minutes < 0 ? "-" : "+";
+  const abs = Math.abs(minutes);
+  const hours = Math.floor(abs / 60);
+  const mins = abs % 60;
+  return mins
+    ? `UTC${sign}${hours}:${String(mins).padStart(2, "0")}`
+    : `UTC${sign}${hours}`;
+}
+
+export type CityClock = {
+  city: WorldCity;
+  clock: ZoneClock | null;
+  minutes: number;
+};
+
+export type OffsetGroup = {
+  offset: string;
+  minutes: number;
+  items: CityClock[];
+};
+
+export function citiesByOffset(now: Date): OffsetGroup[] {
+  const items: CityClock[] = WORLD_CITIES.map((city) => {
+    const clock = clockInZone(now, city.timeZone);
+    return { city, clock, minutes: offsetMinutes(clock.offset) };
+  });
+  items.sort(
+    (a, b) =>
+      b.minutes - a.minutes ||
+      Number(b.city.home) - Number(a.city.home) ||
+      a.city.name.localeCompare(b.city.name),
+  );
+  const groups: OffsetGroup[] = [];
+  for (const item of items) {
+    const last = groups.at(-1);
+    if (last && last.minutes === item.minutes) {
+      last.items.push(item);
+    } else {
+      groups.push({
+        offset: item.clock?.offset ?? formatUtcOffset(item.minutes),
+        minutes: item.minutes,
+        items: [item],
+      });
+    }
+  }
+  return groups;
+}
+
+export function offsetGroupRows(groups: OffsetGroup[], rows = 2): OffsetGroup[][] {
+  const total = groups.reduce((count, group) => count + group.items.length, 0);
+  const target = Math.ceil(total / rows);
+  const result: OffsetGroup[][] = [];
+  let current: OffsetGroup[] = [];
+  let count = 0;
+  for (const group of groups) {
+    if (
+      current.length &&
+      count + group.items.length > target &&
+      result.length < rows - 1
+    ) {
+      result.push(current);
+      current = [];
+      count = 0;
+    }
+    current.push(group);
+    count += group.items.length;
+  }
+  if (current.length) result.push(current);
+  return result;
 }

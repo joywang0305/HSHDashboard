@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { COMPANY_NAME, COMPANY_NAME_ZH } from "@/lib/brand";
 import { useBoard } from "@/components/board-provider";
 import { HkWeather } from "@/components/hk-weather";
@@ -53,36 +53,40 @@ function NavLinks({
 }) {
   const pathname = usePathname();
   return (
-    <nav className={cn("flex flex-wrap items-center gap-x-5 gap-y-2 lg:gap-x-7", className)}>
-      {nav.map((item) => {
+    <nav className={cn("flex flex-wrap items-center gap-x-3.5 gap-y-2", className)}>
+      {nav.map((item, index) => {
         const active =
           item.href === "/"
             ? pathname === "/"
             : pathname.startsWith(item.href);
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            prefetch
-            scroll={false}
-            aria-current={active ? "page" : undefined}
-            onClick={() => {
-              onNavigate?.();
-              if (active) return;
-              onLeave?.(item.href);
-            }}
-            className={cn(
-              "relative z-20 cursor-pointer px-1 py-2 text-[11px] font-medium tracking-[0.28em] uppercase transition-colors",
-              active
-                ? "text-[#004b49]"
-                : "text-[#6b6458] hover:text-[#004b49]",
-            )}
-          >
-            {item.label}
-            {active ? (
-              <span className="pointer-events-none absolute inset-x-0 -bottom-1.5 h-px bg-[#c5a44e]" />
+          <Fragment key={item.href}>
+            {index > 0 ? (
+              <span className="h-5 w-px bg-[#c5a44e]/55" aria-hidden />
             ) : null}
-          </Link>
+            <Link
+              href={item.href}
+              prefetch
+              scroll={false}
+              aria-current={active ? "page" : undefined}
+              onClick={() => {
+                onNavigate?.();
+                if (active) return;
+                onLeave?.(item.href);
+              }}
+              className={cn(
+                "relative z-20 cursor-pointer px-1 py-2 text-[11px] font-medium tracking-[0.28em] uppercase transition-colors",
+                active
+                  ? "text-[#004b49]"
+                  : "text-[#6b6458] hover:text-[#004b49]",
+              )}
+            >
+              {item.label}
+              {active ? (
+                <span className="pointer-events-none absolute inset-x-0 -bottom-1.5 h-px bg-[#c5a44e]" />
+              ) : null}
+            </Link>
+          </Fragment>
         );
       })}
     </nav>

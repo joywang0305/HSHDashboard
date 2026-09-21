@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clockInZone, WORLD_CITIES } from "@/lib/world-clocks";
+import {
+  citiesByOffset,
+  offsetGroupRows,
+  WORLD_CITIES,
+  type CityClock,
+} from "@/lib/world-clocks";
 
 const PENINSULA = "#004b49";
 const PENINSULA_LIT = "#2a6f6c";
@@ -190,6 +195,61 @@ function AnalogFace({
   );
 }
 
+function ClockCard({ city, clock }: CityClock) {
+  const places = city.places.length > 1 ? city.places.join(" · ") : "\u00a0";
+  return (
+    <section className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden border border-[#d9cdb8] bg-white px-3 py-3">
+      <div className="@container flex min-h-0 w-full flex-1 flex-col items-center justify-center">
+        <h2
+          className="max-w-full shrink-0 text-center leading-[1.05] font-medium text-[#004b49]"
+          style={{
+            fontFamily: "var(--font-cormorant), serif",
+            fontSize: "clamp(1.15rem, 11.5cqi, 2.9rem)",
+          }}
+        >
+          {city.name}
+        </h2>
+        <p
+          className="mt-[0.5cqi] shrink-0 text-center tracking-[0.18em] text-[#c5a44e] uppercase"
+          style={{ fontSize: "clamp(0.55rem, 3.3cqi, 0.85rem)" }}
+        >
+          {places}
+        </p>
+        <div className="my-[3.2cqi] aspect-square w-1/2 shrink-0">
+          {clock ? (
+            <AnalogFace
+              id={city.id}
+              hour={clock.hour}
+              minute={clock.minute}
+              second={clock.second}
+              home={city.home}
+            />
+          ) : null}
+        </div>
+        <p
+          className="shrink-0 leading-none text-[#004b49] tabular-nums"
+          style={{
+            fontFamily: "var(--font-cormorant), serif",
+            fontSize: "clamp(1.05rem, 9.4cqi, 2.4rem)",
+          }}
+          suppressHydrationWarning
+        >
+          {clock?.digital ?? "--:--:-- --"}
+        </p>
+        <p
+          className="mt-[1.6cqi] shrink-0 text-center font-medium leading-tight text-[#004b49]"
+          style={{
+            fontFamily: "var(--font-cormorant), serif",
+            fontSize: "clamp(0.8rem, 5.6cqi, 1.35rem)",
+          }}
+        >
+          {clock ? `${clock.weekday} ${clock.date}` : city.timeZone}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export function WorldClockBoard() {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -198,6 +258,16 @@ export function WorldClockBoard() {
     const id = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  const rows = now
+    ? offsetGroupRows(citiesByOffset(now))
+    : offsetGroupRows(
+        WORLD_CITIES.map((city) => ({
+          offset: "",
+          minutes: 0,
+          items: [{ city, clock: null, minutes: 0 }],
+        })),
+      );
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#f7f3eb]">
@@ -212,72 +282,50 @@ export function WorldClockBoard() {
           World clock
         </h1>
       </header>
-      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-5 gap-2 p-2 sm:grid-cols-5 sm:grid-rows-2 md:p-3">
-        {WORLD_CITIES.map((city) => {
-          const clock = now ? clockInZone(now, city.timeZone) : null;
-          const places =
-            city.places.length > 1 ? city.places.join(" · ") : null;
+      <div className="flex min-h-0 flex-1 flex-col gap-2 p-2 md:p-3">
+        {rows.map((row) => {
+          const rowKey = row
+            .map((group) => group.items.map((item) => item.city.id).join("-"))
+            .join("/");
           return (
-            <section
-              key={city.id}
-              className="flex min-h-0 flex-col overflow-hidden border border-[#d9cdb8] bg-white px-3 py-3"
+            <div
+              key={rowKey}
+              className="grid min-h-0 flex-1 gap-x-2 gap-y-1.5"
+              style={{
+                gridTemplateColumns: `repeat(${row.reduce((n, group) => n + group.items.length, 0)}, minmax(0, 1fr))`,
+                gridTemplateRows: "auto minmax(0, 1fr)",
+              }}
             >
-              <div className="@container flex min-h-0 w-full flex-1 flex-col items-center justify-center">
-              <h2
-                className="max-w-full shrink-0 text-center leading-[1.05] font-medium text-[#004b49]"
-                style={{
-                  fontFamily: "var(--font-cormorant), serif",
-                  fontSize: "clamp(1.15rem, 11.5cqi, 2.9rem)",
-                }}
-              >
-                {city.name}
-              </h2>
-              {places ? (
-                <p
-                  className="mt-[0.5cqi] shrink-0 text-center tracking-[0.18em] text-[#c5a44e] uppercase"
-                  style={{ fontSize: "clamp(0.55rem, 3.3cqi, 0.85rem)" }}
-                >
-                  {places}
-                </p>
-              ) : null}
-              <div className="my-[3.2cqi] aspect-square w-1/2 shrink-0">
-                {clock ? (
-                  <AnalogFace
-                    id={city.id}
-                    hour={clock.hour}
-                    minute={clock.minute}
-                    second={clock.second}
-                    home={city.home}
-                  />
-                ) : null}
-              </div>
-              <p
-                className="shrink-0 leading-none text-[#004b49] tabular-nums"
-                style={{
-                  fontFamily: "var(--font-cormorant), serif",
-                  fontSize: "clamp(1.05rem, 9.4cqi, 2.4rem)",
-                }}
-                suppressHydrationWarning
-              >
-                {clock?.digital ?? "--:--:-- --"}
-              </p>
-              <p
-                className="mt-[1.6cqi] shrink-0 text-center font-medium leading-tight text-[#004b49]"
-                style={{
-                  fontFamily: "var(--font-cormorant), serif",
-                  fontSize: "clamp(0.8rem, 5.6cqi, 1.35rem)",
-                }}
-              >
-                {clock ? `${clock.weekday} ${clock.date}` : city.timeZone}
-              </p>
-              <p
-                className="mt-[0.4cqi] shrink-0 text-center tracking-[0.16em] text-[#6b6458]"
-                style={{ fontSize: "clamp(0.55rem, 3.1cqi, 0.9rem)" }}
-              >
-                {clock?.offset ?? ""}
-              </p>
-              </div>
-            </section>
+              {row.map((group, groupIndex) => {
+                const start =
+                  1 +
+                  row
+                    .slice(0, groupIndex)
+                    .reduce((count, item) => count + item.items.length, 0);
+                return (
+                  <div
+                    key={group.offset || group.items[0]?.city.id}
+                    className="flex min-w-0 flex-col items-center justify-end gap-1"
+                    style={{
+                      gridColumn: `${start} / span ${group.items.length}`,
+                      gridRow: 1,
+                    }}
+                  >
+                    <p className="text-[11px] font-medium tracking-[0.22em] text-[#c5a44e] uppercase">
+                      {group.offset || "\u00a0"}
+                    </p>
+                    <span className="h-px w-full bg-[#c5a44e]/50" aria-hidden />
+                  </div>
+                );
+              })}
+              {row.flatMap((group) =>
+                group.items.map((item) => (
+                  <div key={item.city.id} className="min-h-0 min-w-0" style={{ gridRow: 2 }}>
+                    <ClockCard {...item} />
+                  </div>
+                )),
+              )}
+            </div>
           );
         })}
       </div>

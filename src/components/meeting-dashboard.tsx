@@ -29,6 +29,10 @@ const year = stats.hours.find((item) => item.key === "year")!;
 const month = stats.hours.find((item) => item.key === "month")!;
 const week = stats.hours.find((item) => item.key === "week")!;
 const day = stats.hours.find((item) => item.key === "day")!;
+const monthUse = stats.occupancy.find((item) => item.key === "month");
+const monthRooms =
+  (monthUse?.bookedRooms ?? 0) + (monthUse?.availableRooms ?? 0);
+const monthOccupancy = monthRooms ? (monthUse?.bookedRooms ?? 0) / monthRooms : 0;
 const potYear = year.byBuilding.find((item) => item.code === "POT")?.hours ?? 0;
 const sgbYear = year.byBuilding.find((item) => item.code === "SGB")?.hours ?? 0;
 
@@ -284,13 +288,19 @@ export function MeetingDashboard() {
           </Card>
           <div className="grid min-h-0 grid-rows-2 gap-2 lg:col-span-3">
             <Card title="Month use" titleSide>
-              <GaugeChart
-                value={
-                  stats.occupancy.find((item) => item.key === "month")
-                    ?.utilisation ?? 0
-                }
-                label="UTILISATION"
-              />
+              <div className="grid min-h-0 min-w-0 flex-1 grid-cols-2 items-stretch">
+                <GaugeChart
+                  value={monthUse?.utilisation ?? 0}
+                  label="UTILISATION"
+                />
+                <div className="flex min-h-0 min-w-0 border-l border-[#c5a44e]/40">
+                  <GaugeChart
+                    value={monthOccupancy}
+                    label="OCCUPANCY"
+                    tone="gold"
+                  />
+                </div>
+              </div>
             </Card>
             <Kpi
               invert
