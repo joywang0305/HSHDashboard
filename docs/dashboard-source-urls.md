@@ -12,7 +12,7 @@ Reference list of content sources for the HSH workplace dashboard. Collected 21 
 
 ## Social
 
-Refer to the attached social list. It was not included in the message that recorded these URLs, so no social links are stored here yet.
+Source spreadsheet: [`PenterActiveWall_SocialFeeds.xlsx`](./PenterActiveWall_SocialFeeds.xlsx) (copied from iCloud Work Related / HSH / POT New Office).
 
 ## HSH Happenings
 
