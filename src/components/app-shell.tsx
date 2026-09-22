@@ -16,9 +16,17 @@ const nav = [
   { href: "/", label: "Dashboard" },
   { href: "/rooms", label: "Meeting rooms" },
   { href: "/world-clock", label: "World clock" },
+  { href: "/people", label: "People" },
+  { href: "/opportunities", label: "Opportunities" },
 ];
 
-const KIOSK_PAGES = ["/", "/rooms", "/world-clock"] as const;
+const KIOSK_PAGES = [
+  "/",
+  "/rooms",
+  "/world-clock",
+  "/people",
+  "/opportunities",
+] as const;
 const KIOSK_ROTATE_MS = 60_000;
 const KIOSK_IDLE_MS = 5 * 60_000;
 
@@ -39,6 +47,8 @@ function isKioskPath(pathname: string) {
 function leavingLabel(href: string) {
   if (href === "/rooms") return "Opening meeting rooms";
   if (href === "/world-clock") return "Opening world clock";
+  if (href === "/people") return "Opening people";
+  if (href === "/opportunities") return "Opening opportunities";
   return "Opening dashboard";
 }
 
@@ -163,6 +173,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     router.prefetch("/");
     router.prefetch("/rooms");
     router.prefetch("/world-clock");
+    router.prefetch("/people");
+    router.prefetch("/opportunities");
     const preload = () => {
       for (const floor of OFFICE_FLOORS) {
         const cad = new window.Image();
@@ -194,13 +206,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }, 2500);
     return () => window.clearTimeout(id);
   }, [leavingTo]);
-  const clock = new Intl.DateTimeFormat("en-GB", {
-    weekday: "short",
-    hour: "2-digit",
+  const clockTime = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
     minute: "2-digit",
-    hourCycle: "h23",
+    hour12: true,
     timeZone: board?.timezone ?? TIMEZONE,
   }).format(now);
+  const clockDate = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: board?.timezone ?? TIMEZONE,
+  }).format(now);
+  const clock = `${clockTime} · ${clockDate}`;
 
   return (
     <div className="flex h-full flex-col bg-[#f7f3eb]">
@@ -212,7 +231,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="relative z-20 flex shrink-0 items-center justify-end gap-3.5">
             <p
-              className="hidden whitespace-nowrap text-[13px] font-medium tracking-[0.1em] text-[#6b6458] uppercase sm:block"
+              className="hidden whitespace-nowrap text-[12px] font-medium tracking-[0.06em] text-[#6b6458] uppercase sm:block md:text-[13px]"
               suppressHydrationWarning
             >
               {clock}
@@ -230,7 +249,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main
         className={cn(
           "relative flex h-0 min-h-0 flex-1 flex-col",
-          pathname === "/" || pathname.startsWith("/world-clock")
+          pathname === "/" ||
+            pathname.startsWith("/world-clock") ||
+            pathname.startsWith("/people") ||
+            pathname.startsWith("/opportunities")
             ? "overflow-hidden"
             : "overflow-y-auto",
         )}

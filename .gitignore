@@ -46,3 +46,6 @@ next-env.d.ts
 # python
 __pycache__/
 *.pyc
+
+# local delegated Graph tokens (Joy Wang coding login)
+.cache/

@@ -24,8 +24,8 @@ Refer to the attached social list. It was not included in the message that recor
 
 | Item | URL | Notes |
 | --- | --- | --- |
-| New Joiners | https://hshgroup.sharepoint.com/sites/PenterActive/Lists/People/AllItems.aspx | |
-| Anniversaries | https://hshgroup.sharepoint.com/sites/PenterActive/Lists/Service%20Anniversaries/AllItems.aspx | |
+| New Joiners | https://hshgroup.sharepoint.com/sites/PenterActive/Lists/People/AllItems.aspx | Shown on the kiosk **People** page (mock until Graph `Sites.Selected` works). Columns include Name, Join Date, Capital, Division, Attachments (photos). |
+| Anniversaries | https://hshgroup.sharepoint.com/sites/PenterActive/Lists/Service%20Anniversaries/AllItems.aspx | Long-service section on the **People** page. |
 | Who's in Town | https://hshgroup.sharepoint.com/sites/PenterActive/Lists/Whos%20In%20The%20Town/AllItems.aspx | Ignore. OA team has not updated this list since mid-2023. |
 
 ## CEO
@@ -42,4 +42,4 @@ Room calendars and booking already come from Microsoft Graph / Outlook room mail
 
 ## Careers
 
-https://hshgroup.sharepoint.com/sites/PenterActive/Lists/RCM/AllItems.aspx
+https://hshgroup.sharepoint.com/sites/PenterActive/Lists/RCM/AllItems.aspx — shown on the kiosk **Opportunities** page (mock until Graph `Sites.Selected` works). Columns: Title, Operation, Location, PostStartDate, PostEndDate.
