@@ -25,8 +25,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2"
-     inkscape:cx="208.75"
-     inkscape:cy="319.75"
+     inkscape:cx="528.75"
+     inkscape:cy="359.75"
      inkscape:window-width="3008"
      inkscape:window-height="1544"
      inkscape:window-x="3008"
@@ -170,7 +170,8 @@
        x="12.410645"
        y="61.805134" /><g
        id="g24"
-       inkscape:label="POT14-Floorplan"><image
+       inkscape:label="POT14-Floorplan"
+       transform="matrix(1.0068142,0,0,1,-1.8625454,0)"><image
          width="194.14127"
          height="79.230644"
          preserveAspectRatio="none"
@@ -178,7 +179,7 @@
          id="image1"
          x="79.191841"
          y="65.693977" /><rect
-         style="opacity:0.9;fill:#ffffff;stroke:none;stroke-width:0.078;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+         style="opacity:0.9;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.078;stroke-dasharray:none;stroke-opacity:1"
          id="rect24"
          width="0.66145831"
          height="2.2820313"
