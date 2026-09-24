@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="2.8284271"
-     inkscape:cx="608.28861"
-     inkscape:cy="397.57079"
+     inkscape:zoom="2"
+     inkscape:cx="603.25"
+     inkscape:cy="491.75"
      inkscape:window-width="3008"
      inkscape:window-height="1544"
      inkscape:window-x="3008"
@@ -218,4 +218,10 @@
        style="display:none;opacity:0.9;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.078;stroke-dasharray:none;stroke-opacity:1"
        d="m 35.354775,124.45837 1.967839,-0.0165 v 2.48873 l -1.95957,-0.008 z"
        id="path33-0"
-       inkscape:label="POT4F-TrainingCenterVertical" /></g></svg>
+       inkscape:label="POT4F-TrainingCenterVertical" /><rect
+       style="opacity:0.9;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.0808168;stroke-dasharray:none;stroke-opacity:1"
+       id="rect33"
+       width="74.461288"
+       height="1.707184"
+       x="170.34424"
+       y="67.983345" /></g></svg>
