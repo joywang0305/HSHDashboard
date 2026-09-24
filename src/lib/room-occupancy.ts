@@ -28,6 +28,57 @@ export function occupancyFillOpacity(occupancy: RoomOccupancy) {
   return 0.22;
 }
 
+function hexToRgba(hex: string, alpha: number) {
+  const value = hex.replace("#", "");
+  const r = Number.parseInt(value.slice(0, 2), 16);
+  const g = Number.parseInt(value.slice(2, 4), 16);
+  const b = Number.parseInt(value.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export type OccupancyTone = "free" | "in-use" | "booked" | "busy";
+
+export function occupancyTone(occupancy: RoomOccupancy): OccupancyTone {
+  if (occupancy.occupied && occupancy.kind === "booked") return "busy";
+  if (occupancy.occupied) return "in-use";
+  if (occupancy.kind === "booked") return "booked";
+  return "free";
+}
+
+/** Soft wash — keep Peninsula/gold identity without the dashboard’s vivid ramps. */
+export const OCCUPANCY_CSS: Record<OccupancyTone, string> = {
+  free: "linear-gradient(165deg, rgba(0,75,73,0.12) 0%, rgba(0,75,73,0.26) 100%)",
+  "in-use": "linear-gradient(165deg, #0a5c59 0%, #004b49 58%, #003835 100%)",
+  booked: "linear-gradient(165deg, rgba(155,44,44,0.38) 0%, rgba(155,44,44,0.56) 100%)",
+  busy: "linear-gradient(165deg, #b04545 0%, #9b2c2c 55%, #7a2222 100%)",
+};
+
+export const OCCUPANCY_SVG_ID: Record<OccupancyTone, string> = {
+  free: "hsh-occ-free",
+  "in-use": "hsh-occ-inuse",
+  booked: "hsh-occ-booked",
+  busy: "hsh-occ-busy",
+};
+
+/** Shared swatch for room tiles and CAD overlays so both use the same paint. */
+export function occupancyPaint(occupancy: RoomOccupancy) {
+  const fill = OCCUPANCY_FILL[occupancy.kind];
+  const fillOpacity = occupancyFillOpacity(occupancy);
+  const tone = occupancyTone(occupancy);
+  return {
+    fill,
+    fillOpacity,
+    backgroundColor: hexToRgba(fill, fillOpacity ?? 1),
+    backgroundImage: OCCUPANCY_CSS[tone],
+    svgFill: `url(#${OCCUPANCY_SVG_ID[tone]})`,
+    color: occupancy.occupied
+      ? "#f7f3eb"
+      : occupancy.kind === "booked"
+        ? "#9b2c2c"
+        : "#004b49",
+  };
+}
+
 export function occupancyWord(kind: OccupancyKind) {
   if (kind === "booked") return "OCCUPIED";
   if (kind === "in-use") return "IN USE";

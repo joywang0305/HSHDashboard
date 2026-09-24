@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDayLabel, formatNumericDate } from "@/lib/time";
 
@@ -41,6 +41,7 @@ export function DayIntro({
   onNext,
   onPick,
   compact = false,
+  onBookRoom,
 }: {
   eyebrow?: string;
   date: string;
@@ -48,8 +49,14 @@ export function DayIntro({
   onNext: () => void;
   onPick: (date: string) => void;
   compact?: boolean;
+  onBookRoom?: () => void;
 }) {
   const picker = useRef<HTMLInputElement>(null);
+  const [pickerReady, setPickerReady] = useState(false);
+
+  useEffect(() => {
+    setPickerReady(true);
+  }, []);
 
   function openPicker() {
     const input = picker.current;
@@ -87,7 +94,23 @@ export function DayIntro({
           />
         </>
       ) : null}
-      <div className="flex items-center justify-center gap-3 md:gap-5">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className="justify-self-start">
+          {onBookRoom ? (
+            <button
+              type="button"
+              onClick={onBookRoom}
+              className={
+                compact
+                  ? "h-9 cursor-pointer whitespace-nowrap border border-[#004b49] bg-[#004b49] px-3 text-[10px] font-medium tracking-[0.2em] text-[#f7f3eb] uppercase hover:bg-[#0a5a57] md:px-4 md:text-[11px] md:tracking-[0.22em]"
+                  : "h-11 cursor-pointer whitespace-nowrap border border-[#004b49] bg-[#004b49] px-4 text-[11px] font-medium tracking-[0.22em] text-[#f7f3eb] uppercase hover:bg-[#0a5a57]"
+              }
+            >
+              Book a Meeting Room
+            </button>
+          ) : null}
+        </div>
+        <div className="flex items-center justify-center gap-3 md:gap-5">
         <button
           type="button"
           aria-label="Previous day"
@@ -124,18 +147,27 @@ export function DayIntro({
             <span>{formatNumericDate(date)}</span>
             <Calendar className="size-4" />
           </div>
-          <input
-            ref={picker}
-            type="date"
-            lang="en-HK"
-            value={date}
-            onChange={(event) => {
-              if (event.target.value) onPick(event.target.value);
-            }}
-            onClick={openPicker}
-            aria-label="Choose a date"
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-          />
+          {pickerReady ? (
+            <input
+              ref={picker}
+              type="date"
+              lang="en-GB"
+              value={date}
+              onChange={(event) => {
+                if (event.target.value) onPick(event.target.value);
+              }}
+              onClick={openPicker}
+              aria-label="Choose a date"
+              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            />
+          ) : (
+            <button
+              type="button"
+              aria-label="Choose a date"
+              className="absolute inset-0 h-full w-full cursor-pointer"
+              onClick={openPicker}
+            />
+          )}
         </div>
         <button
           type="button"
@@ -149,6 +181,8 @@ export function DayIntro({
         >
           <ChevronRight className={compact ? "size-4" : "size-5"} />
         </button>
+        </div>
+        <div />
       </div>
     </section>
   );

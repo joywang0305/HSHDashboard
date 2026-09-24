@@ -9,6 +9,7 @@ export function AppModal({
   onClose,
   title,
   description,
+  eyebrow = "Reserve",
   children,
   className,
 }: {
@@ -16,6 +17,7 @@ export function AppModal({
   onClose: () => void;
   title: string;
   description?: string;
+  eyebrow?: string;
   children: ReactNode;
   className?: string;
 }) {
@@ -43,13 +45,13 @@ export function AppModal({
         aria-modal="true"
         aria-labelledby="app-modal-title"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-[#c5a44e] bg-[#fffcf7] p-6 text-sm text-[#1c1914] shadow-2xl",
+          "fixed top-1/2 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-4 overflow-y-auto border border-[#c5a44e] bg-[#fffcf7] p-6 text-sm text-[#1c1914] shadow-2xl",
           className,
         )}
       >
         <div className="flex flex-col gap-1 pr-8">
           <p className="text-[10px] tracking-[0.32em] text-[#c5a44e] uppercase">
-            Reserve
+            {eyebrow}
           </p>
           <h2
             id="app-modal-title"

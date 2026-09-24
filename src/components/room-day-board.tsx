@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { BookRoomModal, type SlotDraft } from "@/components/book-room-modal";
+import { BookingDetailModal } from "@/components/booking-detail-modal";
 import { useBoard } from "@/components/board-provider";
 import {
   DAY_END_HOUR,
@@ -37,6 +38,7 @@ export function RoomDayBoard({
 }) {
   const { board, loading, error, now } = useBoard();
   const [draft, setDraft] = useState<SlotDraft | null>(null);
+  const [openBooking, setOpenBooking] = useState<Booking | null>(null);
   const timeZone = board?.timezone;
   const viewingToday = board?.date === todayInZone(timeZone, now);
 
@@ -105,19 +107,18 @@ export function RoomDayBoard({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden border border-[#d9cdb8] bg-white">
-        {floorLabel ? (
-          <div className="flex shrink-0 items-baseline justify-between gap-3 border-b border-[#d9cdb8] px-3 py-1.5">
-            <p
-              className="text-base leading-tight text-[#004b49]"
-              style={{ fontFamily: "var(--font-cormorant), serif" }}
-            >
-              {floorLabel}
-            </p>
-            <p className="text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
-              Tap an empty slot to book
-            </p>
-          </div>
-        ) : null}
+        <div className="flex shrink-0 items-baseline justify-between gap-3 border-b border-[#d9cdb8] px-3 py-1.5">
+          <h2
+            className="min-w-0 text-xl font-medium italic leading-tight text-[#004b49] md:text-2xl"
+            style={{ fontFamily: "var(--font-cormorant), serif" }}
+          >
+            Day schedule
+          </h2>
+          <p className="max-w-[55%] text-right text-[10px] tracking-[0.16em] text-[#6b6458] uppercase">
+            {floorLabel ? `${floorLabel} · ` : null}
+            Tap a booking for details · empty slot to book
+          </p>
+        </div>
         <div
           className="relative z-20 grid shrink-0 min-w-0 overflow-x-auto bg-white"
           style={{
@@ -219,6 +220,7 @@ export function RoomDayBoard({
                       viewingToday={viewingToday}
                       viewDate={board.date}
                       timeZone={timeZone}
+                      onOpen={() => setOpenBooking(booking)}
                     />
                   ))}
                 </div>
@@ -247,6 +249,15 @@ export function RoomDayBoard({
         draft={draft}
         onClose={() => setDraft(null)}
       />
+      <BookingDetailModal
+        booking={openBooking}
+        room={
+          openBooking
+            ? visibleRooms.find((room) => room.id === openBooking.roomId)
+            : undefined
+        }
+        onClose={() => setOpenBooking(null)}
+      />
     </div>
   );
 }
@@ -257,12 +268,14 @@ function BookingBlock({
   viewingToday,
   viewDate,
   timeZone,
+  onOpen,
 }: {
   booking: Booking;
   now: Date;
   viewingToday: boolean;
   viewDate: string;
   timeZone?: string;
+  onOpen: () => void;
 }) {
   const dayStart = DAY_START_HOUR * 60;
   const dayEnd = DAY_END_HOUR * 60;
@@ -277,19 +290,29 @@ function BookingBlock({
   return (
     <button
       type="button"
+      aria-label={`${booking.organizer}, ${formatClock(booking.start, timeZone)} to ${formatClock(booking.end, timeZone)}`}
       className={cn(
-        "absolute right-1 left-1 z-20 overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
-        phase === "current" &&
-          "border-[#9b2c2c] bg-[#9b2c2c] text-white",
-        phase === "past" &&
-          "border-[#c5a44e]/40 bg-[#004b49]/22 text-[#004b49]",
-        phase === "upcoming" &&
-          "border-[#c5a44e] bg-[#004b49] text-white",
+        "absolute right-1 left-1 z-20 cursor-pointer overflow-hidden border-l-2 px-2 py-0.5 text-left shadow-sm",
+        phase === "current" && "border-[#9b2c2c] text-white",
+        phase === "past" && "border-[#c5a44e]/40 text-[#004b49]",
+        phase === "upcoming" && "border-[#c5a44e] text-white",
       )}
-      style={{ top: `${top}%`, height: `${height}%` }}
-      onClick={(event) => event.stopPropagation()}
+      style={{
+        top: `${top}%`,
+        height: `${height}%`,
+        backgroundImage:
+          phase === "current"
+            ? "linear-gradient(165deg, #b04545 0%, #9b2c2c 55%, #7a2222 100%)"
+            : phase === "past"
+              ? "linear-gradient(165deg, rgba(0,75,73,0.12) 0%, rgba(0,75,73,0.26) 100%)"
+              : "linear-gradient(165deg, #0a5c59 0%, #004b49 58%, #003835 100%)",
+      }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpen();
+      }}
     >
-      <p className="truncate text-xs font-medium">{booking.title}</p>
+      <p className="truncate text-xs font-medium">{booking.organizer}</p>
       <p
         className={cn(
           "truncate text-[10px]",
@@ -298,9 +321,7 @@ function BookingBlock({
           phase === "upcoming" && "text-[#c5a44e]",
         )}
       >
-        {formatClock(booking.start, timeZone)}–{formatClock(booking.end, timeZone)}{" "}
-        ·{" "}
-        {booking.organizer}
+        {formatClock(booking.start, timeZone)}–{formatClock(booking.end, timeZone)}
       </p>
     </button>
   );

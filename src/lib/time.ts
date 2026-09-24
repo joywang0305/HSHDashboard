@@ -70,13 +70,34 @@ export function formatNumericDate(date: string) {
   return `${day}/${month}/${year}`;
 }
 
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
 export function formatDayLabel(date: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(`${date}T12:00:00`));
+  const [year, month, day] = date.split("-").map(Number);
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  return `${WEEKDAYS[weekday]}, ${day} ${MONTHS[month - 1]} ${year}`;
 }
 
 export function isIsoDate(value: string | null | undefined): value is string {
@@ -128,4 +149,42 @@ export function isoFromDateAndMinutes(date: string, minutes: number) {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   return zonedDateTime(date, hours, mins).toISOString();
+}
+
+export function formatMinutesClock(minutes: number) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+}
+
+export function slotStartMinutes(durationMinutes: number) {
+  const last = DAY_END_HOUR * 60 - durationMinutes;
+  const starts: number[] = [];
+  for (
+    let minutes = DAY_START_HOUR * 60;
+    minutes <= last;
+    minutes += SLOT_MINUTES
+  ) {
+    starts.push(minutes);
+  }
+  return starts;
+}
+
+/** Next 30-minute board slot on `date`, or null when none remain today. */
+export function nextBookableStartMinutes(
+  now: Date,
+  date: string,
+  durationMinutes: number,
+  timeZone = TIMEZONE,
+) {
+  const starts = slotStartMinutes(durationMinutes);
+  if (starts.length === 0) return null;
+  const today = todayInZone(timeZone, now);
+  if (date < today) return null;
+  if (date > today) return starts[0];
+  const nowMinutes = minutesFromMidnight(now.toISOString(), timeZone);
+  const snapped =
+    Math.ceil(nowMinutes / SLOT_MINUTES) * SLOT_MINUTES;
+  const start = starts.find((item) => item >= snapped) ?? null;
+  return start;
 }

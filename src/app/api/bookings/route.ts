@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CreateBookingInput;
-    if (!body.roomId || !body.title?.trim() || !body.organizer?.trim()) {
+    if (!body.roomId || !body.organizer?.trim()) {
       return NextResponse.json(
-        { error: "Room, title, and who is booking are required." },
+        { error: "Room and who is booking are required." },
         { status: 400 },
       );
     }
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     }
     const booking = createBooking({
       roomId: body.roomId,
-      title: body.title,
+      title: body.title?.trim() || "Ad hoc",
       organizer: body.organizer,
       start: body.start,
       end: body.end,
